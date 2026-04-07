@@ -1,0 +1,72 @@
+namespace Propuestas.Infrastructure.Persistence.Scaffolded;
+
+public class Docente
+{
+    public long Id { get; set; }
+    public long UsuarioIdReferencia { get; set; }
+    public string? Titulo { get; set; }
+    public string? Departamento { get; set; }
+    public ICollection<Propuesta> Propuestas { get; set; } = new List<Propuesta>();
+}
+
+public class Estudiante
+{
+    public long Id { get; set; }
+    public string Nombres { get; set; } = null!;
+    public string Apellidos { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string? Carrera { get; set; }
+    public ICollection<PropuestaEstudiante> PropuestaEstudiantes { get; set; } = new List<PropuestaEstudiante>();
+}
+
+public class Propuesta
+{
+    public long Id { get; set; }
+    public string Codigo { get; set; } = null!;
+    public string Titulo { get; set; } = null!;
+    public string? Descripcion { get; set; }
+    public string? Problema { get; set; }
+    public string? ObjetivoGeneral { get; set; }
+    public string? Alcance { get; set; }
+    public long DocenteId { get; set; }
+    public string EstadoActual { get; set; } = null!;
+    public DateTimeOffset? FechaEnvio { get; set; }
+    public DateTimeOffset FechaUltimaActualizacion { get; set; }
+    public bool Activa { get; set; }
+    public Docente Docente { get; set; } = null!;
+    public ICollection<PropuestaEstudiante> PropuestaEstudiantes { get; set; } = new List<PropuestaEstudiante>();
+    public ICollection<PropuestaObservacion> PropuestaObservaciones { get; set; } = new List<PropuestaObservacion>();
+    public ICollection<PropuestaHistorialEstado> PropuestaHistorialEstados { get; set; } = new List<PropuestaHistorialEstado>();
+}
+
+public class PropuestaEstudiante
+{
+    public long Id { get; set; }
+    public long PropuestaId { get; set; }
+    public long EstudianteId { get; set; }
+    public DateTimeOffset FechaAsignacion { get; set; }
+    public Propuesta Propuesta { get; set; } = null!;
+    public Estudiante Estudiante { get; set; } = null!;
+}
+
+public class PropuestaObservacion
+{
+    public long Id { get; set; }
+    public long PropuestaId { get; set; }
+    public string Observacion { get; set; } = null!;
+    public long CreadoPorUsuarioId { get; set; }
+    public DateTimeOffset CreadoEn { get; set; }
+    public Propuesta Propuesta { get; set; } = null!;
+}
+
+public class PropuestaHistorialEstado
+{
+    public long Id { get; set; }
+    public long PropuestaId { get; set; }
+    public string? EstadoAnterior { get; set; }
+    public string EstadoNuevo { get; set; } = null!;
+    public string? Comentario { get; set; }
+    public long CambiadoPorUsuarioId { get; set; }
+    public DateTimeOffset CambiadoEn { get; set; }
+    public Propuesta Propuesta { get; set; } = null!;
+}

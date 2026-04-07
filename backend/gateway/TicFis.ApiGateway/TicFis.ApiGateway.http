@@ -1,0 +1,6 @@
+@TicFis.ApiGateway_HostAddress = http://localhost:5187
+
+GET {{TicFis.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/gateway/">
+    <Project Path="gateway/TicFis.ApiGateway/TicFis.ApiGateway.csproj" />
+  </Folder>
+  <Folder Name="/services/" />
+  <Folder Name="/services/identity-service/">
+    <Project Path="services/identity-service/Identity.Api/Identity.Api.csproj" />
+    <Project Path="services/identity-service/Identity.Application/Identity.Application.csproj" />
+    <Project Path="services/identity-service/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="services/identity-service/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/propuestas-service/">
+    <Project Path="services/propuestas-service/Propuestas.Api/Propuestas.Api.csproj" />
+    <Project Path="services/propuestas-service/Propuestas.Application/Propuestas.Application.csproj" />
+    <Project Path="services/propuestas-service/Propuestas.Domain/Propuestas.Domain.csproj" />
+    <Project Path="services/propuestas-service/Propuestas.Infrastructure/Propuestas.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/services/reportes-service/">
+    <Project Path="services/reportes-service/Reportes.Api/Reportes.Api.csproj" />
+    <Project Path="services/reportes-service/Reportes.Application/Reportes.Application.csproj" />
+    <Project Path="services/reportes-service/Reportes.Domain/Reportes.Domain.csproj" />
+    <Project Path="services/reportes-service/Reportes.Infrastructure/Reportes.Infrastructure.csproj" />
+  </Folder>
+</Solution>
