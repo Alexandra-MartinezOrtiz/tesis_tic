@@ -1,0 +1,11 @@
+namespace Propuestas.Application.Options;
+
+public class JwtOptions
+{
+    public const string SectionName = "Jwt";
+    public string Issuer { get; set; } = "TicFis";
+    public string Audience { get; set; } = "TicFis";
+    public string SigningKey { get; set; } = "";
+    public int AccessTokenMinutes { get; set; } = 60;
+    public int RefreshTokenDays { get; set; } = 7;
+}

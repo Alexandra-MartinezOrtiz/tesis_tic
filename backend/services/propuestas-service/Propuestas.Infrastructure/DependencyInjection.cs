@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Propuestas.Application.Abstractions;
+using Propuestas.Application.Services;
 using Propuestas.Infrastructure.Persistence.Scaffolded;
+using Propuestas.Infrastructure.Repositories;
 
 namespace Propuestas.Infrastructure;
 
@@ -13,6 +16,8 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         services.AddDbContext<TicfisPropuestasDbContext>(options =>
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
+        services.AddScoped<IPropuestaRepository, PropuestaRepository>();
+        services.AddScoped<IPropuestaService, PropuestaService>();
         return services;
     }
 }

@@ -1,0 +1,2 @@
+# Scripts de shell para Linux/Docker deben usar LF (evita "bad interpreter: /bin/bash^M")
+*.sh text eol=lf
