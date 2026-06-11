@@ -15,14 +15,21 @@ public class PropuestaRepository : IPropuestaRepository
         _db = db;
     }
 
-    public async Task<long> EnsureDocenteAsync(long usuarioIdReferencia, CancellationToken cancellationToken = default)
+    public async Task<long> EnsureDocenteAsync(long usuarioIdReferencia, string? email = null, CancellationToken cancellationToken = default)
     {
-        var existente = await _db.Docentes.AsNoTracking()
+        var existente = await _db.Docentes
             .FirstOrDefaultAsync(d => d.UsuarioIdReferencia == usuarioIdReferencia, cancellationToken)
             .ConfigureAwait(false);
         if (existente is not null)
+        {
+            if (email is not null && existente.Email != email)
+            {
+                existente.Email = email;
+                await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
             return existente.Id;
-        var d = new Docente { UsuarioIdReferencia = usuarioIdReferencia };
+        }
+        var d = new Docente { UsuarioIdReferencia = usuarioIdReferencia, Email = email };
         _db.Docentes.Add(d);
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return d.Id;
@@ -153,7 +160,7 @@ public class PropuestaRepository : IPropuestaRepository
             .OrderByDescending(p => p.FechaUltimaActualizacion)
             .Skip(skip)
             .Take(take)
-            .Select(p => new PropuestaListItemDto(p.Id, p.Codigo, p.Titulo, p.EstadoActual, p.FechaUltimaActualizacion, p.Activa))
+            .Select(p => new PropuestaListItemDto(p.Id, p.Codigo, p.Titulo, p.EstadoActual, p.FechaUltimaActualizacion, p.Activa, p.Docente.Email))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
         return list;

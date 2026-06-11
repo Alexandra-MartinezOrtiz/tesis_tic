@@ -6,7 +6,13 @@ public record PropuestaReporteItemDto(
     string Titulo,
     string EstadoActual,
     DateTimeOffset FechaUltimaActualizacion,
-    bool Activa);
+    bool Activa,
+    string? DocenteEmail);
+
+public record EstudianteReporteDto(
+    string NombreCompleto,
+    string Email,
+    DateTimeOffset FechaAsignacion);
 
 public record PropuestaReporteDetalleDto(
     long Id,
@@ -21,4 +27,5 @@ public record PropuestaReporteDetalleDto(
     string EstadoActual,
     DateTimeOffset? FechaEnvio,
     DateTimeOffset FechaUltimaActualizacion,
-    bool Activa);
+    bool Activa,
+    IReadOnlyList<EstudianteReporteDto> Estudiantes);

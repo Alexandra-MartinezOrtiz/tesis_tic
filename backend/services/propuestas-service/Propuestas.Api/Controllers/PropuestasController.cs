@@ -19,6 +19,7 @@ public class PropuestasController : ControllerBase
     }
 
     private long UserId => long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private string? UserEmail => User.FindFirstValue(ClaimTypes.Email);
     private IReadOnlyList<string> Roles => User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
 
     [HttpGet]
@@ -57,7 +58,7 @@ public class PropuestasController : ControllerBase
     {
         try
         {
-            var det = await _propuestas.CrearAsync(UserId, Roles, request, cancellationToken).ConfigureAwait(false);
+            var det = await _propuestas.CrearAsync(UserId, Roles, request, UserEmail, cancellationToken).ConfigureAwait(false);
             return Created($"/api/propuestas/{det.Id}", det);
         }
         catch (UnauthorizedAccessException)

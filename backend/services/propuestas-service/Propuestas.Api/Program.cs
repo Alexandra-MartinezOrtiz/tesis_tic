@@ -1,40 +1,25 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Propuestas.Application.Options;
 using Propuestas.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPropuestasInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o =>
+builder.Services.AddSwaggerGen(c =>
 {
-    o.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
+        Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Name = "Authorization",
-        Description = "JWT: pega el accessToken (puedes pegarlo sin el prefijo 'Bearer ')."
-    });
-
-    o.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        Description = "Ingrese el token JWT (sin escribir 'Bearer')",
     });
 });
 
@@ -61,15 +46,33 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    app.MapGet("/swagger-auth.js", () => Results.Text("""
+        (function () {
+            var _fetch = window.fetch;
+            window.fetch = function (input, init) {
+                init = init || {};
+                init.headers = init.headers || {};
+                try {
+                    var raw = localStorage.getItem('authorized');
+                    if (raw) {
+                        var auth = JSON.parse(raw);
+                        if (auth.Bearer && auth.Bearer.value) {
+                            init.headers['Authorization'] = 'Bearer ' + auth.Bearer.value;
+                        }
+                    }
+                } catch (e) {}
+                return _fetch(input, init);
+            };
+        })();
+        """, "application/javascript"));
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Propuestas v1");
-        c.RoutePrefix = "swagger";
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Propuestas API v1");
         c.ConfigObject.AdditionalItems["persistAuthorization"] = true;
+        c.InjectJavascript("/swagger-auth.js");
     });
 }
 

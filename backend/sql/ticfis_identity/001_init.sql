@@ -1,4 +1,4 @@
--- Microservicio C — Identity Service (sección 11.2)
+6t5ty3eww-- Microservicio C — Identity Service (sección 11.2)
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE roles (

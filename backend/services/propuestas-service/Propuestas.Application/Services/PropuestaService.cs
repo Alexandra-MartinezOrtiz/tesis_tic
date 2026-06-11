@@ -17,13 +17,13 @@ public class PropuestaService : IPropuestaService
     private static bool EsCpgic(IReadOnlyList<string> roles) => roles.Contains("CPGIC", StringComparer.OrdinalIgnoreCase) || EsAdmin(roles);
     private static bool EsDocente(IReadOnlyList<string> roles) => roles.Contains("Docente", StringComparer.OrdinalIgnoreCase) || EsAdmin(roles);
 
-    public async Task<PropuestaDetailDto> CrearAsync(long usuarioId, IReadOnlyList<string> roles, CreatePropuestaRequest request, CancellationToken cancellationToken = default)
+    public async Task<PropuestaDetailDto> CrearAsync(long usuarioId, IReadOnlyList<string> roles, CreatePropuestaRequest request, string? docenteEmail = null, CancellationToken cancellationToken = default)
     {
         if (!EsDocente(roles))
             throw new UnauthorizedAccessException("Se requiere rol Docente.");
         if (await _repo.CodigoExisteAsync(request.Codigo, null, cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("El código de propuesta ya existe.");
-        var docenteId = await _repo.EnsureDocenteAsync(usuarioId, cancellationToken).ConfigureAwait(false);
+        var docenteId = await _repo.EnsureDocenteAsync(usuarioId, docenteEmail, cancellationToken).ConfigureAwait(false);
         var id = await _repo.InsertPropuestaAsync(request, docenteId, usuarioId, cancellationToken).ConfigureAwait(false);
         var det = await _repo.GetDetailAsync(id, cancellationToken).ConfigureAwait(false);
         return det ?? throw new InvalidOperationException("No se pudo cargar la propuesta creada.");

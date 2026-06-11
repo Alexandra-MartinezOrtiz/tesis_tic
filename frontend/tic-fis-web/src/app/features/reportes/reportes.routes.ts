@@ -6,4 +6,9 @@ export const REPORTES_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/reportes-home.component').then((m) => m.ReportesHomeComponent),
   },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./pages/reporte-detalle.component').then((m) => m.ReporteDetalleComponent),
+  },
 ];

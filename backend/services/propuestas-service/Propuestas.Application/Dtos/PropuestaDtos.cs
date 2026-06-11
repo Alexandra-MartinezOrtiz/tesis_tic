@@ -6,7 +6,8 @@ public record PropuestaListItemDto(
     string Titulo,
     string EstadoActual,
     DateTimeOffset FechaUltimaActualizacion,
-    bool Activa);
+    bool Activa,
+    string? DocenteEmail);
 
 public record PropuestaDetailDto(
     long Id,

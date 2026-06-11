@@ -47,12 +47,16 @@
               "buildTarget": "tic-fis-web:build:production"
             },
             "development": {
-              "buildTarget": "tic-fis-web:build:development"
+              "buildTarget": "tic-fis-web:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "e02f1866-ac70-4b8a-b8f3-c546a2900c31"
   }
 }

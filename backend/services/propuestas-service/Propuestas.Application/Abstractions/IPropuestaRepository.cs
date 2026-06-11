@@ -4,7 +4,7 @@ namespace Propuestas.Application.Abstractions;
 
 public interface IPropuestaRepository
 {
-    Task<long> EnsureDocenteAsync(long usuarioIdReferencia, CancellationToken cancellationToken = default);
+    Task<long> EnsureDocenteAsync(long usuarioIdReferencia, string? email = null, CancellationToken cancellationToken = default);
     Task<bool> CodigoExisteAsync(string codigo, long? excludePropuestaId, CancellationToken cancellationToken = default);
     Task<long> InsertPropuestaAsync(CreatePropuestaRequest request, long docenteId, long actorUsuarioId, CancellationToken cancellationToken = default);
     Task<PropuestaDetailDto?> GetDetailAsync(long propuestaId, CancellationToken cancellationToken = default);

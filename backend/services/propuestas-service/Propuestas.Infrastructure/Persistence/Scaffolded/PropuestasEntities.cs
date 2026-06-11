@@ -4,6 +4,7 @@ public class Docente
 {
     public long Id { get; set; }
     public long UsuarioIdReferencia { get; set; }
+    public string? Email { get; set; }
     public string? Titulo { get; set; }
     public string? Departamento { get; set; }
     public ICollection<Propuesta> Propuestas { get; set; } = new List<Propuesta>();

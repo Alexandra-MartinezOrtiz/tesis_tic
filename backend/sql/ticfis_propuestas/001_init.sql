@@ -4,6 +4,7 @@
 CREATE TABLE docentes (
     id BIGSERIAL PRIMARY KEY,
     usuario_id_referencia BIGINT NOT NULL,
+    email VARCHAR(320),
     titulo VARCHAR(200),
     departamento VARCHAR(200)
 );

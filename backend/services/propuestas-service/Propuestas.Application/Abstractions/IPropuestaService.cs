@@ -4,7 +4,7 @@ namespace Propuestas.Application.Abstractions;
 
 public interface IPropuestaService
 {
-    Task<PropuestaDetailDto> CrearAsync(long usuarioId, IReadOnlyList<string> roles, CreatePropuestaRequest request, CancellationToken cancellationToken = default);
+    Task<PropuestaDetailDto> CrearAsync(long usuarioId, IReadOnlyList<string> roles, CreatePropuestaRequest request, string? docenteEmail = null, CancellationToken cancellationToken = default);
     Task<PropuestaDetailDto> ActualizarAsync(long usuarioId, IReadOnlyList<string> roles, long propuestaId, UpdatePropuestaRequest request, CancellationToken cancellationToken = default);
     Task<PropuestaDetailDto> ObtenerAsync(long usuarioId, IReadOnlyList<string> roles, long propuestaId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PropuestaListItemDto>> ListarAsync(long usuarioId, IReadOnlyList<string> roles, string? estado, int page, int pageSize, CancellationToken cancellationToken = default);
