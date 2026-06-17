@@ -148,6 +148,29 @@ representativa de la integración entre microservicios. **Prueba exitosa.**
 
 ---
 
+## Anexo — Preparación de los datos de prueba
+
+> **Nota de alcance:** el registro de propuestas pertenece al **módulo de Propuestas**
+> del sistema TIC-FIS, no al módulo de Consultas y Reportes documentado en esta tesis.
+> Las siguientes capturas se incluyen únicamente como respaldo del **origen de los datos**
+> utilizados en las pruebas del módulo de Reportes.
+
+Para las pruebas, las propuestas se registran con el formato del formulario F\_AA\_233A.
+Una propuesta nueva queda con cupo inicial **0/5** cuando no se asignan estudiantes, y el
+sistema admite un **máximo de cinco estudiantes** por propuesta, valor a partir del cual
+deja de considerarse disponible. Esto explica por qué el módulo de Reportes muestra cada
+propuesta con su número de cupos y su disponibilidad.
+
+**Registro de propuesta (cupo inicial 0/5):**
+
+![SPRINT1_Formulario_Propuesta_Aprobada.png](img/SPRINT1_Formulario_Propuesta_Aprobada.png)
+
+**Validación del máximo de cinco estudiantes:**
+
+![SPRINT1_Validacion_Maximo_5_Estudiantes.png](img/SPRINT1_Validacion_Maximo_5_Estudiantes.png)
+
+---
+
 > **Nota aclaratoria:** este documento es un respaldo técnico complementario del
 > repositorio del proyecto y **no forma parte del cuerpo principal de la tesis**. En la
 > tesis, estas pruebas se sintetizan en la tabla "Resumen de las pruebas funcionales
