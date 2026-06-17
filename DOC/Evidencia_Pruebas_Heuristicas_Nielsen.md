@@ -83,7 +83,22 @@ satisfactorio en las diez heurísticas (40/40, 100 %)**. La revisión heurístic
 una técnica ágil y de bajo costo para detectar y corregir problemas de usabilidad de
 forma temprana, sin requerir sesiones formales con usuarios finales.
 
-## 6. Nota aclaratoria
+## 6. Evidencia visual — Auditoría de rendimiento y accesibilidad (Lighthouse)
+
+Como parte de las **pruebas no funcionales**, se ejecutó una auditoría automatizada
+con **Lighthouse** sobre la interfaz del módulo, evaluando rendimiento, accesibilidad,
+buenas prácticas y SEO. A continuación se muestran las capturas de la auditoría inicial
+y del resultado tras aplicar las optimizaciones.
+
+**Auditoría inicial:**
+
+![foto_lighthouse.png](img/foto_lighthouse.png)
+
+**Auditoría tras optimización:**
+
+![foto_lighthouse_optimizado.png](img/foto_lighthouse_optimizado.png)
+
+## 7. Nota aclaratoria
 
 > Esta revisión heurística constituye **evidencia técnica complementaria** del trabajo
 > realizado sobre la interfaz del módulo. **No forma parte del documento principal de
