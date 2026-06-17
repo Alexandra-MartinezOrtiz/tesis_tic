@@ -14,13 +14,15 @@ de la tesis se conserva la descripción de la arquitectura y el diseño; estas c
 infraestructura se trasladan aquí para reducir la extensión del documento **sin perder la
 evidencia técnica**. Este material **no forma parte del documento principal de la tesis**.
 
-> Las imágenes referenciadas se encuentran en `02Figures/02Chapter/` del repositorio.
+> Las imágenes referenciadas se encuentran en `img/` de este directorio del repositorio.
 
 ---
 
 ## 1. Estructura modular del backend (Arquitectura Limpia)
 
 - **Imagen:** `SPRINT0_Arquitectura_Modular_Backend.png`
+
+![SPRINT0_Arquitectura_Modular_Backend.png](img/SPRINT0_Arquitectura_Modular_Backend.png)
 - **Qué evidencia:** cada microservicio (Propuestas y Reportes) organiza su código en
   cuatro proyectos .NET independientes:
   - `*.Api` — controladores y configuración de inicio.
@@ -35,6 +37,8 @@ evidencia técnica**. Este material **no forma parte del documento principal de 
 ## 2. Contenedores Docker activos
 
 - **Imagen:** `SPRINT0_Docker_PostgreSQL_Activo.png`
+
+![SPRINT0_Docker_PostgreSQL_Activo.png](img/SPRINT0_Docker_PostgreSQL_Activo.png)
 - **Qué evidencia:** dos contenedores activos durante las sesiones de desarrollo:
   - `backend` — API REST desarrollada con ASP.NET Core.
   - `ticfis-postgre` — imagen oficial de PostgreSQL 16, expuesta en el puerto `5432:5432`.

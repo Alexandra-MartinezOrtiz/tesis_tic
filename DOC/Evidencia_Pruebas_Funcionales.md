@@ -16,7 +16,7 @@ técnico que **no forma parte del documento principal de la tesis**.
 
 Todas las pruebas se ejecutaron con la técnica de caja negra sobre el entorno de
 desarrollo local, usando Swagger UI sobre la API y Google Chrome para la interfaz
-Angular. Las imágenes referenciadas se encuentran en `02Figures/03Chapter/`.
+Angular. Las imágenes referenciadas se encuentran en `img/` de este directorio.
 
 ---
 
@@ -36,8 +36,14 @@ con opción de imprimir o exportar a PDF.
 7. Se confirmó la disponibilidad de «Guardar como PDF» en el selector de destino.
 
 **Evidencia:** `foto4_detalle_propuesta.png` (respuesta JSON del endpoint),
+
+![foto4_detalle_propuesta.png](img/foto4_detalle_propuesta.png)
 `foto8_formulario_f233a.png` (formulario completo en Angular),
+
+![foto8_formulario_f233a.png](img/foto8_formulario_f233a.png)
 `foto9_impresion_formulario.png` (diálogo de impresión con «Guardar como PDF»).
+
+![foto9_impresion_formulario.png](img/foto9_impresion_formulario.png)
 
 **Resultado:** el endpoint retornó el DTO completo; el formulario se renderizó íntegro
 con todas las secciones pobladas y la exportación a PDF disponible. **Prueba exitosa.**
@@ -57,6 +63,8 @@ con todas las secciones pobladas y la exportación a PDF disponible. **Prueba ex
 5. Se confirmó que el servidor no escribe el archivo en disco: se construye en memoria y se serializa al flujo de respuesta HTTP.
 
 **Evidencia:** `foto5_export_pdf.png` (respuesta HTTP 200 con los encabezados y los
+
+![foto5_export_pdf.png](img/foto5_export_pdf.png)
 69 748 bytes).
 
 **Resultado:** documento PDF generado y entregado correctamente, en memoria, apropiado
@@ -81,7 +89,11 @@ credenciales y atienda las que presentan un token válido emitido por el Identit
 9. El sistema retornó `HTTP 200` con el arreglo de propuestas.
 
 **Evidencia:** `foto1_login_exitoso.png` (emisión de tokens),
+
+![foto1_login_exitoso.png](img/foto1_login_exitoso.png)
 `foto2_sin_token_401.png` (respuesta 401 sin token).
+
+![foto2_sin_token_401.png](img/foto2_sin_token_401.png)
 
 **Resultado:** solo las solicitudes autenticadas acceden a la información; valida la
 integración Identity Service ↔ Reportes Service. **Prueba exitosa.**
@@ -103,6 +115,8 @@ microservicio correcto y retransmita la respuesta sin alteraciones.
 7. Se comparó la respuesta vía gateway con la directa del Reportes Service: equivalentes.
 
 **Evidencia:** `foto_gateway_enrutamiento.png` (configuración YARP: `/api/reportes/{**remainder}`
+
+![foto_gateway_enrutamiento.png](img/foto_gateway_enrutamiento.png)
 → `reportes_cluster` → `http://localhost:5003/`).
 
 **Resultado:** enrutamiento transparente, sin alteración de código HTTP, encabezados ni
@@ -125,6 +139,8 @@ tiempo real los datos del Propuestas Service, sin réplica local y propagando el
 7. Se verificó que el Reportes Service no posee tabla de propuestas propia: toda la información proviene del Propuestas Service en cada solicitud.
 
 **Evidencia:** `foto3_listado_propuestas.png` (resultado compuesto en tiempo real).
+
+![foto3_listado_propuestas.png](img/foto3_listado_propuestas.png)
 
 **Resultado:** composición correcta, con fuente única de verdad en el servicio de origen
 y JWT propagado sin exponerlo ni almacenarlo. Es la validación funcional más
