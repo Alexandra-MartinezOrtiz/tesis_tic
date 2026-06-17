@@ -127,28 +127,30 @@ export class ReporteDetalleComponent implements OnInit {
 
 ## 5. Filtrado reactivo con `computed()` y signals — Sprint 3
 
-`propuestasFiltradas` recalcula en memoria el subconjunto visible sin peticiones
-adicionales al servidor; `contar()` opera sobre la colección completa.
+`propuestasFiltradas` recalcula en memoria el subconjunto visible (por disponibilidad
+y búsqueda) sin peticiones adicionales al servidor; los indicadores operan sobre la
+colección completa.
 
 ```typescript
-type FilterEstado = '' | 'Borrador' | 'EnRevision'
-                      | 'Aprobada' | 'Rechazada' | 'Pendiente';
+type FilterDisponibilidad = '' | 'Disponibles' | 'No disponibles';
 
-filtroEstado   = signal<FilterEstado>('');
+filtroDisponibilidad = signal<FilterDisponibilidad>('');
 busquedaValue  = toSignal(
     this.filtrosForm.controls.busqueda.valueChanges,
     { initialValue: '' });
 
 propuestasFiltradas = computed(() => {
-    const estado = this.filtroEstado();
-    const busq   = (this.busquedaValue() ?? '').toLowerCase().trim();
+    const disp = this.filtroDisponibilidad();
+    const busq = (this.busquedaValue() ?? '').toLowerCase().trim();
     return this.propuestas().filter(p => {
-      const matchEstado = !estado || p.estadoActual === estado;
+      const matchDisp = !disp
+        || (disp === 'Disponibles'    &&  p.disponible)
+        || (disp === 'No disponibles' && !p.disponible);
       const matchBusq   = !busq
         || p.codigo.toLowerCase().includes(busq)
         || p.titulo.toLowerCase().includes(busq)
         || (p.docenteEmail ?? '').toLowerCase().includes(busq);
-      return matchEstado && matchBusq;
+      return matchDisp && matchBusq;
     });
   });
 

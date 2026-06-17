@@ -37,8 +37,8 @@ evidencia técnica**. Este material **no forma parte del documento principal de 
 - **Endpoint:** `GET /api/reportes/propuestas/{id}`
 - **Qué evidencia:** el cuerpo JSON devuelto incluye los campos del contrato
   `PropuestaReporteDetalleDto` con código `200 OK`. Algunos campos aparecen nulos
-  (p. ej. `fechaEnvio`, `estudiantes`) porque la propuesta estaba en estado borrador,
-  lo que validó la tolerancia a nulos en la deserialización.
+  (p. ej. `fechaEnvio`, `estudiantes`) porque la propuesta aún no tenía estudiantes
+  asignados (0/5), lo que validó la tolerancia a nulos en la deserialización.
 - **Resultado:** serialización correcta del modelo hacia el consumidor de la API.
 
 ## 3. Sprint 5 — Exportación del reporte PDF resumen
@@ -46,7 +46,7 @@ evidencia técnica**. Este material **no forma parte del documento principal de 
 - **Imagen:** `SPRINT2_Exportacion_PDF_Swagger.png`
 
 ![SPRINT2_Exportacion_PDF_Swagger.png](img/SPRINT2_Exportacion_PDF_Swagger.png)
-- **Endpoint:** `GET /api/reportes/propuestas/export/pdf` (filtro `estado=borrador`)
+- **Endpoint:** `GET /api/reportes/propuestas/export/pdf` (con el filtro de disponibilidad activo)
 - **Qué evidencia:** la respuesta `200 OK` incluye `Content-Disposition: attachment`,
   un nombre de archivo generado dinámicamente con la fecha (`YYYY-MM-DD`) y tipo MIME
   `application/pdf` (~65 KB).
@@ -57,7 +57,7 @@ evidencia técnica**. Este material **no forma parte del documento principal de 
 - **Imagen:** `SPRINT6_Swagger_FormulariosPDF.png`
 
 ![SPRINT6_Swagger_FormulariosPDF.png](img/SPRINT6_Swagger_FormulariosPDF.png)
-- **Endpoint:** `GET /api/reportes/propuestas/export/pdf-formularios` (filtro `estado=borrador`)
+- **Endpoint:** `GET /api/reportes/propuestas/export/pdf-formularios` (con el filtro de disponibilidad activo)
 - **Qué evidencia:** respuesta `200 OK` con `Content-Type: application/pdf`,
   `Content-Disposition: attachment` y tamaño `141 187` bytes.
 - **Resultado:** generación correcta del documento multipágina en memoria.

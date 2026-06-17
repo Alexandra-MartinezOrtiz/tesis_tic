@@ -26,13 +26,13 @@
     <td><b>Iteración asignada:</b> 1</td>
   </tr>
   <tr>
-    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero visualizar el listado de propuestas de Trabajo de Integración Curricular (TIC) gestionadas por la CPGIC, para consultar su estado, proponente y acceder al detalle de cada una desde la interfaz del sistema.</td>
+    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero visualizar el listado de propuestas de Trabajo de Integración Curricular (TIC) aprobadas por la CPGIC, para consultar su disponibilidad, proponente y acceder al detalle de cada una desde la interfaz del sistema.</td>
   </tr>
   <tr>
     <td colspan="2">
       <b>Criterios de aceptación:</b>
       <ul>
-        <li>El listado muestra código, título, estado, proponente y fecha de última actualización.</li>
+        <li>El listado muestra código, título, proponente, cupos, disponibilidad y fecha de última actualización.</li>
         <li>El usuario puede navegar al detalle de cualquier propuesta seleccionada.</li>
         <li>La ruta del módulo está protegida y redirige al inicio de sesión si no existe token activo.</li>
       </ul>

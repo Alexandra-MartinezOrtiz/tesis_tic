@@ -26,14 +26,14 @@
     <td><b>Iteración asignada:</b> 3</td>
   </tr>
   <tr>
-    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero filtrar y buscar propuestas TIC por estado, código, título o nombre del docente, para localizar registros específicos de manera rápida y eficiente sin revisar el catálogo completo.</td>
+    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero filtrar y buscar las propuestas TIC aprobadas por disponibilidad, código, título o nombre del proponente, para localizar registros específicos de manera rápida y eficiente sin revisar el catálogo completo.</td>
   </tr>
   <tr>
     <td colspan="2">
       <b>Criterios de aceptación:</b>
       <ul>
-        <li>El sistema permite filtrar propuestas por estado (Borrador, EnRevision, Aprobada, Rechazada, Pendiente).</li>
-        <li>El usuario puede buscar propuestas por código, título o nombre del docente en tiempo real.</li>
+        <li>El sistema permite filtrar las propuestas aprobadas por disponibilidad (Todas, Disponibles, No disponibles).</li>
+        <li>El usuario puede buscar propuestas por código, título o nombre del proponente en tiempo real.</li>
         <li>Los filtros pueden combinarse sin afectar la consistencia ni duplicar lógica de consulta.</li>
       </ul>
     </td>

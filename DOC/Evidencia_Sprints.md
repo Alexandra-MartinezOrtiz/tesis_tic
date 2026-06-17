@@ -34,15 +34,15 @@ técnico que **no forma parte del documento principal de la tesis**.
 
 | Tarea | Descripción | Criterio de aceptación |
 |---|---|---|
-| T05 | Extender el endpoint de listado con parámetros de filtrado opcionales aplicando el patrón *Specification* | El parámetro `?estado=aprobada` retorna únicamente propuestas con ese estado; los criterios se combinan sin duplicar lógica de consulta |
-| T06 | Desarrollar el componente de filtros avanzados en Angular con signals reactivos y búsqueda en memoria | El panel expone controles de estado y búsqueda de texto libre por código, título o docente; el filtrado ocurre en tiempo real sin peticiones adicionales al servidor |
+| T05 | Extender el endpoint de listado con parámetros de filtrado opcionales aplicando el patrón *Specification* | El filtro de disponibilidad retorna únicamente las propuestas que correspondan; los criterios se combinan sin duplicar lógica de consulta |
+| T06 | Desarrollar el componente de filtros en Angular con signals reactivos y búsqueda en memoria | El panel expone el selector de disponibilidad (Todas, Disponibles, No disponibles) y la búsqueda de texto libre por código, título o proponente; el filtrado ocurre en tiempo real sin peticiones adicionales al servidor |
 
-## Sprint 4 — Generación de reportes (panel estadístico)
+## Sprint 4 — Panel de indicadores de disponibilidad
 
 | Tarea | Descripción | Criterio de aceptación |
 |---|---|---|
-| T07 | Implementar los contadores estadísticos derivados del signal de propuestas en Angular | El método `contar()` calcula totales por estado en memoria sin llamadas HTTP adicionales al servidor |
-| T08 | Desarrollar el panel de tarjetas estadísticas e integrarlo con el listado y los filtros activos | Las tarjetas muestran totales actualizados al cargar el módulo y al aplicar filtros; cada tarjeta filtra el listado al hacer clic |
+| T07 | Implementar los indicadores de disponibilidad derivados del signal de propuestas en Angular | Los indicadores calculan en memoria el total de aprobadas, disponibles, no disponibles y cupos ocupados, sin llamadas HTTP adicionales al servidor |
+| T08 | Desarrollar el panel de tarjetas de disponibilidad e integrarlo con el listado y los filtros activos | Las tarjetas muestran totales actualizados al cargar el módulo y al aplicar filtros |
 
 ## Sprint 5 — Generación del reporte PDF resumen
 

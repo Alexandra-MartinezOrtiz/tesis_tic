@@ -14,7 +14,7 @@
     <td><b>Usuario:</b> Usuario autenticado del sistema</td>
   </tr>
   <tr>
-    <td><b>Nombre historia:</b> Visualización de estadísticas por estado de propuesta</td>
+    <td><b>Nombre historia:</b> Visualización de indicadores de disponibilidad de propuestas</td>
     <td></td>
   </tr>
   <tr>
@@ -26,15 +26,15 @@
     <td><b>Iteración asignada:</b> 4</td>
   </tr>
   <tr>
-    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero visualizar un panel de resumen con el total de propuestas TIC y su distribución por estado, para obtener una visión general del portafolio sin necesidad de revisar cada registro individualmente.</td>
+    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero visualizar un panel de resumen con el total de propuestas TIC aprobadas y su disponibilidad, para obtener una visión general del portafolio sin necesidad de revisar cada registro individualmente.</td>
   </tr>
   <tr>
     <td colspan="2">
       <b>Criterios de aceptación:</b>
       <ul>
-        <li>El panel muestra el conteo total de propuestas y la distribución por cada estado definido en el sistema.</li>
-        <li>Los contadores se actualizan automáticamente al cargar el módulo y al aplicar filtros.</li>
-        <li>Cada tarjeta estadística permite filtrar el listado por el estado que representa al hacer clic.</li>
+        <li>El panel muestra el total de propuestas aprobadas, las disponibles, las no disponibles y los cupos ocupados.</li>
+        <li>Los indicadores se actualizan automáticamente al cargar el módulo y al aplicar filtros.</li>
+        <li>La disponibilidad se calcula a partir de los cupos, con un máximo de cinco estudiantes por propuesta.</li>
       </ul>
     </td>
   </tr>
@@ -42,7 +42,7 @@
     <td colspan="2">
       <b>Observaciones:</b>
       <ul>
-        <li>Los contadores se calculan en el frontend a partir de los datos ya cargados, sin llamadas HTTP adicionales.</li>
+        <li>Los indicadores se calculan en el frontend a partir de los datos ya cargados, sin llamadas HTTP adicionales.</li>
       </ul>
     </td>
   </tr>

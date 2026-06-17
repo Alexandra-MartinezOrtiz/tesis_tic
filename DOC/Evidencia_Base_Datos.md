@@ -45,8 +45,8 @@ Tres vistas que simplifican las consultas frecuentes del módulo:
 
 - `v_propuestas_reporte` — listado de propuestas con el conteo de estudiantes asignados.
 - `v_propuesta_detalle` — detalle completo de una propuesta incluyendo todos sus integrantes.
-- `v_estadisticas_estado` — propuestas agrupadas por estado, con los contadores que usa el
-  panel de resumen de la interfaz.
+- `v_estadisticas_estado` — propuestas agrupadas por estado; vista de apoyo disponible en
+  la base de datos para agregaciones del módulo.
 
 ---
 
