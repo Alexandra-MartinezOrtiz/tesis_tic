@@ -6,28 +6,47 @@
 
 ---
 
-## HU03 — Filtrado y búsqueda de propuestas TIC
+**Tabla. Historia de usuario HU03**
 
-| Campo | Valor |
-|---|---|
-| **Código** | HU03 |
-| **Usuario** | Usuario autenticado del sistema |
-| **Prioridad en negocio** | Alta |
-| **Riesgo en desarrollo** | Medio |
-| **Puntos estimados** | 5 |
-| **Iteración asignada** | Sprint 3 |
-
-**Descripción:** Como usuario autenticado, quiero filtrar y buscar propuestas TIC por
-estado, código, título o nombre del docente, para localizar registros específicos de
-manera rápida y eficiente sin revisar el catálogo completo.
-
-**Criterios de aceptación:**
-- El sistema permite filtrar propuestas por estado (Borrador, EnRevision, Aprobada, Rechazada, Pendiente).
-- El usuario puede buscar propuestas por código, título o nombre del docente en tiempo real.
-- Los filtros pueden combinarse sin afectar la consistencia ni duplicar lógica de consulta.
-
-**Observaciones:**
-- La búsqueda de texto libre se aplica en memoria sobre los datos ya cargados para evitar peticiones adicionales al servidor.
+<table>
+  <tr>
+    <td><b>Código:</b> HU03</td>
+    <td><b>Usuario:</b> Usuario autenticado del sistema</td>
+  </tr>
+  <tr>
+    <td><b>Nombre historia:</b> Filtrado y búsqueda de propuestas TIC</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><b>Prioridad en negocio:</b> Alta</td>
+    <td><b>Riesgo en desarrollo:</b> Medio</td>
+  </tr>
+  <tr>
+    <td><b>Puntos estimados:</b> 5</td>
+    <td><b>Iteración asignada:</b> 3</td>
+  </tr>
+  <tr>
+    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero filtrar y buscar propuestas TIC por estado, código, título o nombre del docente, para localizar registros específicos de manera rápida y eficiente sin revisar el catálogo completo.</td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <b>Criterios de aceptación:</b>
+      <ul>
+        <li>El sistema permite filtrar propuestas por estado (Borrador, EnRevision, Aprobada, Rechazada, Pendiente).</li>
+        <li>El usuario puede buscar propuestas por código, título o nombre del docente en tiempo real.</li>
+        <li>Los filtros pueden combinarse sin afectar la consistencia ni duplicar lógica de consulta.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <b>Observaciones:</b>
+      <ul>
+        <li>La búsqueda de texto libre se aplica en memoria sobre los datos ya cargados para evitar peticiones adicionales al servidor.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
 ---
 

@@ -6,28 +6,47 @@
 
 ---
 
-## HU01 — Consulta del listado de propuestas TIC aprobadas
+**Tabla. Historia de usuario HU01**
 
-| Campo | Valor |
-|---|---|
-| **Código** | HU01 |
-| **Usuario** | Usuario autenticado del sistema |
-| **Prioridad en negocio** | Alta |
-| **Riesgo en desarrollo** | Medio |
-| **Puntos estimados** | 5 |
-| **Iteración asignada** | Sprint 1 |
-
-**Descripción:** Como usuario autenticado, quiero visualizar el listado de propuestas de
-Trabajo de Integración Curricular (TIC) gestionadas por la CPGIC, para consultar su
-estado, proponente y acceder al detalle de cada una desde la interfaz del sistema.
-
-**Criterios de aceptación:**
-- El listado muestra código, título, estado, proponente y fecha de última actualización.
-- El usuario puede navegar al detalle de cualquier propuesta seleccionada.
-- La ruta del módulo está protegida y redirige al inicio de sesión si no existe token activo.
-
-**Observaciones:**
-- La información se obtiene en tiempo real desde el servicio de Propuestas mediante API Composition.
+<table>
+  <tr>
+    <td><b>Código:</b> HU01</td>
+    <td><b>Usuario:</b> Usuario autenticado del sistema</td>
+  </tr>
+  <tr>
+    <td><b>Nombre historia:</b> Consulta del listado de propuestas TIC aprobadas</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><b>Prioridad en negocio:</b> Alta</td>
+    <td><b>Riesgo en desarrollo:</b> Medio</td>
+  </tr>
+  <tr>
+    <td><b>Puntos estimados:</b> 5</td>
+    <td><b>Iteración asignada:</b> 1</td>
+  </tr>
+  <tr>
+    <td colspan="2"><b>Descripción:</b> Como usuario autenticado, quiero visualizar el listado de propuestas de Trabajo de Integración Curricular (TIC) gestionadas por la CPGIC, para consultar su estado, proponente y acceder al detalle de cada una desde la interfaz del sistema.</td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <b>Criterios de aceptación:</b>
+      <ul>
+        <li>El listado muestra código, título, estado, proponente y fecha de última actualización.</li>
+        <li>El usuario puede navegar al detalle de cualquier propuesta seleccionada.</li>
+        <li>La ruta del módulo está protegida y redirige al inicio de sesión si no existe token activo.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <b>Observaciones:</b>
+      <ul>
+        <li>La información se obtiene en tiempo real desde el servicio de Propuestas mediante API Composition.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
 ---
 
