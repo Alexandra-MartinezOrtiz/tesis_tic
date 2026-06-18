@@ -26,6 +26,7 @@ services:
     container_name: ticfis-identity-api
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ticfis_identity;Username=postgres;Password=postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,6 +44,7 @@ services:
     container_name: ticfis-propuestas-api
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ticfis_propuestas;Username=postgres;Password=postgres
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,6 +62,8 @@ services:
     container_name: ticfis-reportes-api
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ticfis_reportes;Username=postgres;Password=postgres
+      PropuestasApi__BaseUrl: http://propuestas-api:5002
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,6 +83,15 @@ services:
     container_name: ticfis-gateway
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ReverseProxy__Clusters__identity_cluster__Destinations__identity__Address: http://identity-api:5001/
+      ReverseProxy__Clusters__identity_cluster__HttpRequest__Version: "1.1"
+      ReverseProxy__Clusters__identity_cluster__HttpRequest__VersionPolicy: RequestVersionExact
+      ReverseProxy__Clusters__propuestas_cluster__Destinations__propuestas__Address: http://propuestas-api:5002/
+      ReverseProxy__Clusters__propuestas_cluster__HttpRequest__Version: "1.1"
+      ReverseProxy__Clusters__propuestas_cluster__HttpRequest__VersionPolicy: RequestVersionExact
+      ReverseProxy__Clusters__reportes_cluster__Destinations__reportes__Address: http://reportes-api:5003/
+      ReverseProxy__Clusters__reportes_cluster__HttpRequest__Version: "1.1"
+      ReverseProxy__Clusters__reportes_cluster__HttpRequest__VersionPolicy: RequestVersionExact
     ports:
       - "5000:5000"
     depends_on:

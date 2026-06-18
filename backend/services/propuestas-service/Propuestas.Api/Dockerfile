@@ -6,6 +6,7 @@ RUN dotnet publish services/propuestas-service/Propuestas.Api/Propuestas.Api.csp
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends wget libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:5002
 EXPOSE 5002
