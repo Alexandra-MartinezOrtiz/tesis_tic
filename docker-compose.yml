@@ -1,0 +1,110 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticfis-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ticfis_pgdata:/var/lib/postgresql/data
+      - ./backend/docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/00-init-databases.sh:ro
+      - ./backend/sql:/scripts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  identity-api:
+    build:
+      context: ./backend
+      dockerfile: services/identity-service/Identity.Api/Dockerfile
+    container_name: ticfis-identity-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  propuestas-api:
+    build:
+      context: ./backend
+      dockerfile: services/propuestas-service/Propuestas.Api/Dockerfile
+    container_name: ticfis-propuestas-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  reportes-api:
+    build:
+      context: ./backend
+      dockerfile: services/reportes-service/Reportes.Api/Dockerfile
+    container_name: ticfis-reportes-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      propuestas-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5003/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  gateway:
+    build:
+      context: ./backend
+      dockerfile: gateway/TicFis.ApiGateway/Dockerfile
+    container_name: ticfis-gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    ports:
+      - "5000:5000"
+    depends_on:
+      identity-api:
+        condition: service_healthy
+      propuestas-api:
+        condition: service_healthy
+      reportes-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend/tic-fis-web
+      dockerfile: Dockerfile
+    container_name: ticfis-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      gateway:
+        condition: service_healthy
+
+volumes:
+  ticfis_pgdata:
