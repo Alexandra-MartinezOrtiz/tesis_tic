@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "TIC-FIS: Iniciar todo",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\iniciar_todo.ps1"],
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "echo": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "TIC-FIS: Solo backend",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass", "-Command",
+        "Start-Process dotnet -ArgumentList 'run' -WorkingDirectory 'backend/services/identity-service/Identity.Api' -WindowStyle Minimized; Start-Process dotnet -ArgumentList 'run' -WorkingDirectory 'backend/services/propuestas-service/Propuestas.Api' -WindowStyle Minimized; Start-Process dotnet -ArgumentList 'run' -WorkingDirectory 'backend/services/reportes-service/Reportes.Api' -WindowStyle Minimized; Start-Process dotnet -ArgumentList 'run' -WorkingDirectory 'backend/gateway/TicFis.ApiGateway' -WindowStyle Minimized; Write-Host 'Backends iniciados'"
+      ],
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": []
+    },
+    {
+      "label": "TIC-FIS: Solo frontend",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "npm start"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend/tic-fis-web"
+      },
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": []
+    }
+  ]
+}

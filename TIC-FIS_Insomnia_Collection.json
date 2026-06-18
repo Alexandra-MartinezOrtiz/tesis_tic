@@ -1,0 +1,185 @@
+{
+  "_type": "export",
+  "exportFormat": 4,
+  "exportDate": "2026-05-01T00:00:00.000Z",
+  "resources": [
+    {
+      "_id": "wrk_ticfis",
+      "_type": "workspace",
+      "name": "TIC-FIS Backend Testing",
+      "description": "Colección para probar todos los endpoints del backend TIC-FIS",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_ticfis",
+      "_type": "environment",
+      "parentId": "wrk_ticfis",
+      "name": "TIC-FIS Local",
+      "data": {
+        "base_url": "http://localhost:5000",
+        "identity_url": "http://localhost:5001",
+        "propuestas_url": "http://localhost:5002",
+        "reportes_url": "http://localhost:5003",
+        "access_token": "",
+        "refresh_token": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "identity_url",
+          "propuestas_url",
+          "reportes_url",
+          "access_token",
+          "refresh_token"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1000000000000
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_ticfis",
+      "name": "🔐 Auth (Identity Service)",
+      "description": "Autenticación y gestión de usuarios",
+      "environment": {}
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "1. Login",
+      "url": "{{ identity_url }}/api/auth/login",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"docente@example.com\",\n  \"password\": \"Password123!\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingShowMultilineBuilder": false
+    },
+    {
+      "_id": "req_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "2. Refresh Token",
+      "url": "{{ identity_url }}/api/auth/refresh",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"{{ refresh_token }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 900000000000,
+      "isPrivate": false
+    },
+    {
+      "_id": "req_forgot_password",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "3. Forgot Password",
+      "url": "{{ identity_url }}/api/auth/forgot-password",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"docente@example.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 800000000000,
+      "isPrivate": false
+    },
+    {
+      "_id": "req_reset_password",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "4. Reset Password",
+      "url": "{{ identity_url }}/api/auth/reset-password",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"docente@example.com\",\n  \"token\": \"reset_token_aqui\",\n  \"newPassword\": \"NewPassword456!\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 700000000000,
+      "isPrivate": false
+    },
+    {
+      "_id": "fld_usuarios",
+      "_type": "request_group",
+      "parentId": "wrk_ticfis",
+      "name": "👥 Usuarios (Admin - Identity Service)",
+      "description": "Gestión de usuarios (requiere rol Admin)",
+      "environment": {}
+    },
+    {
+      "_id": "req_list_usuarios",
+      "_type": "request",
+      "parentId": "fld_usuarios",
+      "name": "1. Listar Usuarios",
+      "url": "{{ identity_url }}/api/usuarios",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 600000000000,
+      "isPrivate": false
+    },
+    {
+      "_id": "req_create_usuario",
+      "_type": "request",
+      "parentId": "fld_usuarios",
+      "name": "2. Crear Usuario",
+      "url": "{{ identity_url }}/api/usuarios",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"activo\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 500000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_update_usuario\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_usuarios\",\n      \"name\": \"3. Actualizar Usuario (ID)\",\n      \"url\": \"{{ identity_url }}/api/usuarios/1\",\n      \"method\": \"PUT\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"nombres\\\": \\\"Juan Actualizado\\\",\n  \\\"apellidos\\\": \\\"Pérez\\\",\n  \\\"email\\\": \\\"juan.perez.updated@example.com\\\",\n  \\\"activo\\\": true\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 400000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_assign_roles\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_usuarios\",\n      \"name\": \"4. Asignar Roles a Usuario (ID)\",\n      \"url\": \"{{ identity_url }}/api/usuarios/1/roles\",\n      \"method\": \"POST\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"roleIds\\\": [1, 2]\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 300000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"fld_propuestas\",\n      \"_type\": \"request_group\",\n      \"parentId\": \"wrk_ticfis\",\n      \"name\": \"📋 Propuestas (Propuestas Service)\",\n      \"description\": \"Gestión de propuestas TIC\",\n      \"environment\": {}\n    },\n    {\n      \"_id\": \"req_list_propuestas\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"1. Listar Propuestas\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas?estado=Aprobada&page=1&pageSize=20\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [\n        {\n          \"name\": \"estado\",\n          \"value\": \"Aprobada\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"page\",\n          \"value\": \"1\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"pageSize\",\n          \"value\": \"20\",\n          \"disabled\": false\n        }\n      ],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 200000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_get_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"2. Obtener Propuesta por ID\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 100000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_create_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"3. Crear Propuesta\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas\",\n      \"method\": \"POST\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"titulo\\\": \\\"Sistema de Gestión de Propuestas TIC\\\",\n  \\\"descripcion\\\": \\\"Sistema para gestionar propuestas de TIC en la facultad\\\",\n  \\\"problema\\\": \\\"Falta de sistematización en el proceso de propuestas\\\",\n  \\\"objetivoGeneral\\\": \\\"Digitalizar el proceso de propuestas TIC\\\",\n  \\\"alcance\\\": \\\"Gestión completa del ciclo de vida de propuestas\\\"\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 50000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_update_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"4. Actualizar Propuesta\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1\",\n      \"method\": \"PUT\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"titulo\\\": \\\"Sistema de Gestión de Propuestas TIC - Actualizado\\\",\n  \\\"descripcion\\\": \\\"Sistema actualizado para gestionar propuestas de TIC\\\",\n  \\\"problema\\\": \\\"Falta de sistematización mejorada\\\",\n  \\\"objetivoGeneral\\\": \\\"Digitalizar el proceso de propuestas TIC con mejoras\\\",\n  \\\"alcance\\\": \\\"Gestión completa del ciclo de vida de propuestas\\\"\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 40000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_enviar_revision\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"5. Enviar Propuesta a Revisión\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1/enviar-revision\",\n      \"method\": \"POST\",\n      \"body\": {},\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 30000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_aprobar_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"6. Aprobar Propuesta\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1/aprobar\",\n      \"method\": \"POST\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"comentario\\\": \\\"Propuesta aprobada. Cumple con todos los requisitos.\\\"\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 20000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_rechazar_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"7. Rechazar Propuesta\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1/rechazar\",\n      \"method\": \"POST\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"comentario\\\": \\\"Propuesta rechazada. No cumple con los requisitos solicitados.\\\"\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 10000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_pendiente_propuesta\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_propuestas\",\n      \"name\": \"8. Marcar Propuesta como Pendiente\",\n      \"url\": \"{{ propuestas_url }}/api/propuestas/1/pendiente\",\n      \"method\": \"POST\",\n      \"body\": {\n        \"mimeType\": \"application/json\",\n        \"text\": \"{\n  \\\"comentario\\\": \\\"Propuesta pendiente de ajustes menores.\\\"\n}\"\n      },\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        },\n        {\n          \"name\": \"Content-Type\",\n          \"value\": \"application/json\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 5000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"fld_reportes\",\n      \"_type\": \"request_group\",\n      \"parentId\": \"wrk_ticfis\",\n      \"name\": \"📊 Reportes (Reportes Service)\",\n      \"description\": \"Consultas y exportación de reportes\",\n      \"environment\": {}\n    },\n    {\n      \"_id\": \"req_list_reportes\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_reportes\",\n      \"name\": \"1. Listar Propuestas (Reportes)\",\n      \"url\": \"{{ reportes_url }}/api/reportes/propuestas?estado=Aprobada&busqueda=&page=1&pageSize=100\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [\n        {\n          \"name\": \"estado\",\n          \"value\": \"Aprobada\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"busqueda\",\n          \"value\": \"\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"page\",\n          \"value\": \"1\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"pageSize\",\n          \"value\": \"100\",\n          \"disabled\": false\n        }\n      ],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 9000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_get_reporte\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_reportes\",\n      \"name\": \"2. Obtener Propuesta (Reportes)\",\n      \"url\": \"{{ reportes_url }}/api/reportes/propuestas/1\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 8000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_export_pdf\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_reportes\",\n      \"name\": \"3. Exportar PDF\",\n      \"url\": \"{{ reportes_url }}/api/reportes/propuestas/export/pdf?estado=Aprobada&busqueda=\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [\n        {\n          \"name\": \"estado\",\n          \"value\": \"Aprobada\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"busqueda\",\n          \"value\": \"\",\n          \"disabled\": false\n        }\n      ],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 7000000000,\n      \"isPrivate\": false\n    },\n    {\n      \"_id\": \"req_export_excel\",\n      \"_type\": \"request\",\n      \"parentId\": \"fld_reportes\",\n      \"name\": \"4. Exportar Excel\",\n      \"url\": \"{{ reportes_url }}/api/reportes/propuestas/export/excel?estado=Aprobada&busqueda=\",\n      \"method\": \"GET\",\n      \"body\": {},\n      \"parameters\": [\n        {\n          \"name\": \"estado\",\n          \"value\": \"Aprobada\",\n          \"disabled\": false\n        },\n        {\n          \"name\": \"busqueda\",\n          \"value\": \"\",\n          \"disabled\": false\n        }\n      ],\n      \"headers\": [\n        {\n          \"name\": \"Authorization\",\n          \"value\": \"Bearer {{ access_token }}\"\n        }\n      ],\n      \"authentication\": {},\n      \"metaSortKey\": 6000000000,\n      \"isPrivate\": false\n    }\n  ]\n}

@@ -14,6 +14,11 @@ public class ReportesConsultaService : IReportesService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
 
+    // El módulo de Consultas y Reportes trabaja únicamente con propuestas aprobadas.
+    private const string EstadoAprobada = "aprobada";
+    // Cupo máximo de estudiantes por propuesta aprobada.
+    private const int CupoMaximo = 5;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -42,9 +47,8 @@ public class ReportesConsultaService : IReportesService
         int page, int pageSize, CancellationToken cancellationToken = default)
     {
         using var client = CreateClient(authorizationHeader);
-        var url = $"api/propuestas?page={page}&pageSize={pageSize}";
-        if (!string.IsNullOrWhiteSpace(estado))
-            url += $"&estado={Uri.EscapeDataString(estado)}";
+        // Este módulo siempre consulta propuestas aprobadas, sin importar el parámetro recibido.
+        var url = $"api/propuestas?page={page}&pageSize={pageSize}&estado={Uri.EscapeDataString(EstadoAprobada)}";
         var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -61,7 +65,19 @@ public class ReportesConsultaService : IReportesService
             ).ToList();
         }
 
-        return list;
+        // Calcula cupos y disponibilidad a partir de los estudiantes propuestos.
+        return list
+            .Select(p =>
+            {
+                var ocupados = Math.Clamp(p.EstudiantesPropuestos, 0, CupoMaximo);
+                return p with
+                {
+                    EstudiantesPropuestos = ocupados,
+                    CupoMaximo = CupoMaximo,
+                    Disponible = ocupados < CupoMaximo,
+                };
+            })
+            .ToList();
     }
 
     public async Task<PropuestaReporteDetalleDto?> ObtenerPropuestaAsync(
@@ -91,6 +107,10 @@ public class ReportesConsultaService : IReportesService
             }
         }
 
+        var estudiantesPropuestos = root.TryGetProperty("estudiantesPropuestos", out var ep) && ep.TryGetInt32(out var epVal)
+            ? Math.Clamp(epVal, 0, CupoMaximo)
+            : 0;
+
         return new PropuestaReporteDetalleDto(
             root.TryGetProperty("id", out var idProp) ? idProp.GetInt64() : 0,
             root.TryGetProperty("codigo", out var cod) ? cod.GetString() ?? "" : "",
@@ -105,6 +125,9 @@ public class ReportesConsultaService : IReportesService
             root.TryGetProperty("fechaEnvio", out var fe) && fe.ValueKind != JsonValueKind.Null && fe.TryGetDateTimeOffset(out var feDto) ? feDto : null,
             root.TryGetProperty("fechaUltimaActualizacion", out var fua) && fua.TryGetDateTimeOffset(out var fuaDto) ? fuaDto : DateTimeOffset.MinValue,
             root.TryGetProperty("activa", out var act) ? act.GetBoolean() : true,
+            estudiantesPropuestos,
+            CupoMaximo,
+            estudiantesPropuestos < CupoMaximo,
             estudiantes
         );
     }
@@ -133,15 +156,14 @@ public class ReportesConsultaService : IReportesService
                                 .Bold().FontSize(11).FontColor("#0E2240");
                             c.Item().Text("Facultad de Ingeniería en Sistemas")
                                 .FontSize(9).FontColor("#616161");
-                            c.Item().Text("Sistema TIC-FIS — Reporte de Propuestas")
+                            c.Item().Text("Sistema TIC-FIS — Reporte de Propuestas Aprobadas")
                                 .Bold().FontSize(10).FontColor("#0E2240");
                         });
-                        row.ConstantItem(150).AlignRight().Column(c =>
+                        row.ConstantItem(160).AlignRight().Column(c =>
                         {
                             c.Item().Text($"Generado: {generado}").FontSize(8).FontColor("#616161");
-                            if (!string.IsNullOrWhiteSpace(estado))
-                                c.Item().Text($"Filtro estado: {estado}").FontSize(8).FontColor("#616161");
-                            c.Item().Text($"Total: {items.Count} propuestas").Bold().FontSize(9);
+                            c.Item().Text("Solo propuestas aprobadas").FontSize(8).FontColor("#616161");
+                            c.Item().Text($"Total aprobadas: {items.Count}").Bold().FontSize(9);
                         });
                     });
                     col.Item().PaddingTop(4).LineHorizontal(2).LineColor("#F3BD46");
@@ -156,7 +178,8 @@ public class ReportesConsultaService : IReportesService
                         c.ConstantColumn(80);
                         c.RelativeColumn(3);
                         c.RelativeColumn(2);
-                        c.RelativeColumn(2);
+                        c.ConstantColumn(45);
+                        c.ConstantColumn(60);
                         c.ConstantColumn(80);
                     });
 
@@ -170,7 +193,8 @@ public class ReportesConsultaService : IReportesService
                         h.Cell().Element(HeaderCell).Text("Código");
                         h.Cell().Element(HeaderCell).Text("Título");
                         h.Cell().Element(HeaderCell).Text("Proponente");
-                        h.Cell().Element(HeaderCell).Text("Estado");
+                        h.Cell().Element(HeaderCell).Text("Cupos");
+                        h.Cell().Element(HeaderCell).Text("Disponible");
                         h.Cell().Element(HeaderCell).Text("Últ. actualización");
                     });
 
@@ -188,10 +212,9 @@ public class ReportesConsultaService : IReportesService
                         table.Cell().Element(c => DataCell(c, bg)).Text(p.Codigo).Bold();
                         table.Cell().Element(c => DataCell(c, bg)).Text(p.Titulo);
                         table.Cell().Element(c => DataCell(c, bg)).Text(p.DocenteEmail ?? "—").FontColor("#616161");
-                        table.Cell().Element(c => DataCell(c, bg)).Text(p.EstadoActual)
-                            .FontColor(p.EstadoActual == "Aprobada" ? "#2E7D32"
-                                : p.EstadoActual == "Rechazada" ? "#E31D1A"
-                                : "#0E2240");
+                        table.Cell().Element(c => DataCell(c, bg)).Text($"{p.EstudiantesPropuestos}/{p.CupoMaximo}").Bold();
+                        table.Cell().Element(c => DataCell(c, bg)).Text(p.Disponible ? "Sí" : "No")
+                            .Bold().FontColor(p.Disponible ? "#2E7D32" : "#9E9E9E");
                         table.Cell().Element(c => DataCell(c, bg)).Text(
                             p.FechaUltimaActualizacion.LocalDateTime.ToString("dd/MM/yyyy")).FontColor("#616161");
                     }
@@ -216,20 +239,20 @@ public class ReportesConsultaService : IReportesService
         var p = await ObtenerPropuestaAsync(authorizationHeader, id, cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException($"Propuesta {id} no encontrada.");
 
-        var generado = DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm");
         var letras = new[] { "A", "B", "C", "D", "E" };
 
+        // Estilo neutro tipo documento Word (gris claro / negro), igual al formulario oficial F_AA_233A.
         static IContainer CeldaSeccion(IContainer c) =>
-            c.Background("#0E2240").Padding(5);
+            c.Background("#D9D9D9").Border(0.5f).BorderColor("#000000").Padding(5);
 
         static IContainer CeldaLabel(IContainer c) =>
-            c.Background("#E8EDF4").Padding(5).Border(0.5f).BorderColor("#CCCCCC");
+            c.Background("#FFFFFF").Padding(5).Border(0.5f).BorderColor("#000000");
 
         static IContainer CeldaValor(IContainer c) =>
-            c.Background("#FFFFFF").Padding(5).Border(0.5f).BorderColor("#CCCCCC");
+            c.Background("#FFFFFF").Padding(5).Border(0.5f).BorderColor("#000000");
 
         static IContainer CeldaActHdr(IContainer c) =>
-            c.Background("#E8EDF4").Padding(4).Border(0.5f).BorderColor("#CCCCCC");
+            c.Background("#D9D9D9").Padding(4).Border(0.5f).BorderColor("#000000");
 
         var document = Document.Create(container =>
         {
@@ -247,20 +270,20 @@ public class ReportesConsultaService : IReportesService
                         row.RelativeItem().Column(c =>
                         {
                             c.Item().Text("ESCUELA POLITÉCNICA NACIONAL")
-                                .Bold().FontSize(11).FontColor("#0E2240");
-                            c.Item().Text("Facultad de Ingeniería en Sistemas")
-                                .FontSize(8).FontColor("#616161");
+                                .Bold().FontSize(11).FontColor("#000000");
+                            c.Item().Text("Facultad de Ingeniería de Sistemas")
+                                .FontSize(8).FontColor("#333333");
                         });
                         row.ConstantItem(75).AlignRight()
-                            .Text("F_AA_233A").Bold().FontSize(10).FontColor("#0E2240");
+                            .Text("F_AA_233A").Bold().FontSize(10).FontColor("#000000");
                     });
                     col.Item().PaddingTop(3).AlignCenter()
                         .Text("CONSEJO DE DOCENCIA")
-                        .Bold().FontSize(10).FontColor("#0E2240");
+                        .Bold().FontSize(10).FontColor("#000000");
                     col.Item().AlignCenter()
                         .Text("FORMULARIO DEL PROYECTO DE TRABAJO DE INTEGRACIÓN CURRICULAR")
-                        .Bold().FontSize(9).FontColor("#0E2240");
-                    col.Item().PaddingTop(4).LineHorizontal(1.5f).LineColor("#0E2240");
+                        .Bold().FontSize(9).FontColor("#000000");
+                    col.Item().PaddingTop(4).LineHorizontal(1.5f).LineColor("#000000");
                     col.Item().PaddingBottom(5);
                 });
 
@@ -276,7 +299,7 @@ public class ReportesConsultaService : IReportesService
                         });
 
                         table.Cell().ColumnSpan(2).Element(CeldaSeccion)
-                            .Text("DATOS GENERALES").Bold().FontColor("#FFFFFF").FontSize(9);
+                            .Text("DATOS GENERALES").Bold().FontColor("#000000").FontSize(9);
 
                         void Fila(string etiqueta, string valor)
                         {
@@ -284,15 +307,20 @@ public class ReportesConsultaService : IReportesService
                             table.Cell().Element(CeldaValor).Text(valor).FontSize(8.5f);
                         }
 
-                        Fila("Unidad Académica:", "Facultad de Ingeniería en Sistemas (FIS)");
-                        Fila("Carrera:", "Ingeniería en Ciencias de la Computación");
+                        Fila("Unidad Académica:", "Facultad de Ingeniería de Sistemas");
+                        Fila("Carrera:", "Ingeniería de Software");
                         Fila("Proyecto:", p.Titulo);
-                        Fila("Número de participantes:", p.Estudiantes.Count > 0
-                            ? p.Estudiantes.Count.ToString()
-                            : "Por definir");
+                        Fila("Número de participantes:", p.EstudiantesPropuestos.ToString());
+                        Fila("Cupos / Disponible:", $"{p.EstudiantesPropuestos}/{p.CupoMaximo}   —   {(p.Disponible ? "Sí" : "No")}");
                         Fila("Departamento:", "Departamento de Informática y Ciencias de la Computación");
-                        Fila("Línea de investigación:", "Ingeniería de Software y Sistemas de Información");
-                        Fila("Asignaturas:", "Trabajo de Integración Curricular");
+                        Fila("Línea de investigación:", "Ingeniería de Software");
+                        Fila("Asignaturas:",
+                            "Fundamentos de bases de datos (ISWD453)\n" +
+                            "Diseño de Software (ISWD523)\n" +
+                            "Metodologías ágiles (ISWD613)\n" +
+                            "Calidad de Software (ISWD652)\n" +
+                            "Aplicaciones Web Avanzadas (ISWD813)\n" +
+                            "Usabilidad y Accesibilidad (ISWD732)");
                         Fila("Profesor:", $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
                     });
 
@@ -304,7 +332,7 @@ public class ReportesConsultaService : IReportesService
                         table.ColumnsDefinition(c => c.RelativeColumn());
 
                         table.Cell().Element(CeldaSeccion)
-                            .Text("DESCRIPCIÓN DEL PROYECTO").Bold().FontColor("#FFFFFF").FontSize(9);
+                            .Text("DESCRIPCIÓN DEL PROYECTO").Bold().FontColor("#000000").FontSize(9);
 
                         var sb = new System.Text.StringBuilder();
                         if (!string.IsNullOrWhiteSpace(p.Descripcion))
@@ -314,14 +342,22 @@ public class ReportesConsultaService : IReportesService
                             if (sb.Length > 0) sb.Append("\n\n");
                             sb.Append("Problema identificado:\n").Append(p.Problema);
                         }
-                        if (!string.IsNullOrWhiteSpace(p.ObjetivoGeneral))
-                        {
-                            if (sb.Length > 0) sb.Append("\n\n");
-                            sb.Append("Objetivo general:\n").Append(p.ObjetivoGeneral);
-                        }
 
                         table.Cell().Element(CeldaValor).MinHeight(55)
                             .Text(sb.Length > 0 ? sb.ToString() : "—")
+                            .FontSize(9).LineHeight(1.5f);
+                    });
+
+                    col.Item().PaddingTop(5);
+
+                    // ── OBJETIVO DEL PROYECTO ──
+                    col.Item().Table(table =>
+                    {
+                        table.ColumnsDefinition(c => c.RelativeColumn());
+                        table.Cell().Element(CeldaSeccion)
+                            .Text("OBJETIVO DEL PROYECTO").Bold().FontColor("#000000").FontSize(9);
+                        table.Cell().Element(CeldaValor).MinHeight(35)
+                            .Text(!string.IsNullOrWhiteSpace(p.ObjetivoGeneral) ? p.ObjetivoGeneral : "—")
                             .FontSize(9).LineHeight(1.5f);
                     });
 
@@ -332,7 +368,7 @@ public class ReportesConsultaService : IReportesService
                     {
                         table.ColumnsDefinition(c => c.RelativeColumn());
                         table.Cell().Element(CeldaSeccion)
-                            .Text("ALCANCE DEL PROYECTO").Bold().FontColor("#FFFFFF").FontSize(9);
+                            .Text("ALCANCE DEL PROYECTO").Bold().FontColor("#000000").FontSize(9);
                         table.Cell().Element(CeldaValor).MinHeight(40)
                             .Text(!string.IsNullOrWhiteSpace(p.Alcance) ? p.Alcance : "—")
                             .FontSize(9).LineHeight(1.5f);
@@ -340,71 +376,44 @@ public class ReportesConsultaService : IReportesService
 
                     col.Item().PaddingTop(5);
 
-                    // ── RELACIÓN CON PROYECTOS AFINES (Opcional) ──
-                    col.Item().Table(table =>
-                    {
-                        table.ColumnsDefinition(c =>
-                        {
-                            c.RelativeColumn(1.2f);
-                            c.RelativeColumn(0.9f);
-                            c.RelativeColumn(1.9f);
-                        });
-
-                        table.Cell().ColumnSpan(3).Element(CeldaSeccion)
-                            .Text("RELACIÓN DEL PROYECTO PLANTEADO CON PROYECTOS AFINES DEL PROFESOR (Opcional)")
-                            .Bold().FontColor("#FFFFFF").FontSize(9);
-
-                        table.Cell().Element(CeldaLabel).Text("Investigación").Bold().FontSize(8.5f);
-                        table.Cell().Element(CeldaLabel).Text("Código Proyecto:").FontSize(8.5f);
-                        table.Cell().Element(CeldaValor).Text("—").FontSize(8.5f);
-
-                        table.Cell().Element(CeldaLabel).Text("Vinculación").Bold().FontSize(8.5f);
-                        table.Cell().Element(CeldaLabel).Text("Código Proyecto:").FontSize(8.5f);
-                        table.Cell().Element(CeldaValor).Text("—").FontSize(8.5f);
-                    });
-
-                    col.Item().PaddingTop(5);
-
                     // ── COMPONENTES, ACTIVIDADES Y PRODUCTOS ──
                     col.Item().Element(CeldaSeccion)
-                        .Text("COMPONENTES, ACTIVIDADES ESPECÍFICAS Y PRODUCTOS")
-                        .Bold().FontColor("#FFFFFF").FontSize(9);
+                        .Text("COMPONENTES, ACTIVIDADES Y PRODUCTOS")
+                        .Bold().FontColor("#000000").FontSize(9);
 
-                    if (p.Estudiantes.Count == 0)
+                    var slots = Math.Clamp(p.EstudiantesPropuestos, 0, CupoMaximo);
+                    if (slots == 0)
                     {
                         col.Item().Background("#FFF8E1").Padding(8)
-                            .Text("Sin estudiantes asignados. La propuesta está disponible para asignación.")
+                            .Text($"Sin estudiantes propuestos. La propuesta está disponible para asignación (0/{p.CupoMaximo}).")
                             .FontSize(9).FontColor("#F57F17").Italic();
                     }
                     else
                     {
-                        for (var i = 0; i < p.Estudiantes.Count; i++)
+                        for (var i = 0; i < slots; i++)
                         {
-                            var est = p.Estudiantes[i];
                             var letra = i < letras.Length ? letras[i] : (i + 1).ToString();
+                            var nombre = p.Estudiantes.Count > i ? p.Estudiantes[i].NombreCompleto : "";
 
                             col.Item().PaddingTop(5).Column(estCol =>
                             {
-                                // Cabecera del estudiante
-                                estCol.Item().Background("#F3BD46").Padding(5)
+                                // Cabecera del estudiante (texto plano, estilo documento)
+                                estCol.Item().Border(0.5f).BorderColor("#000000").Padding(5)
                                     .Text($"Estudiante {letra}:")
-                                    .Bold().FontSize(9).FontColor("#0E2240");
+                                    .Bold().FontSize(9).FontColor("#000000");
 
-                                // Componente
+                                // Módulo / Componente (plantilla en blanco)
                                 estCol.Item().Table(t =>
                                 {
-                                    t.ColumnsDefinition(c => c.RelativeColumn());
+                                    t.ColumnsDefinition(c => { c.RelativeColumn(1.4f); c.RelativeColumn(2.6f); });
                                     t.Cell().Element(CeldaLabel)
-                                        .Text("Componente").Bold().FontSize(8.5f).FontColor("#0E2240");
-                                    t.Cell().Element(CeldaValor).MinHeight(22)
-                                        .Text("(Pendiente — dato proveniente del módulo de gestión de propuestas)")
-                                        .FontSize(8.5f).FontColor("#9E9E9E").Italic();
-                                    t.Cell().Element(CeldaLabel)
-                                        .Text("Actividades específicas y horas asignadas")
-                                        .Bold().FontSize(8.5f).FontColor("#0E2240");
+                                        .Text("Módulo / Componente").Bold().FontSize(8.5f).FontColor("#000000");
+                                    t.Cell().Element(CeldaValor).MinHeight(20).Text("");
                                 });
 
-                                // Tabla de actividades
+                                // Tabla de actividades (No. / Actividades específicas / Horas + Total)
+                                estCol.Item().PaddingTop(2).Text("Actividades específicas y horas asignadas:")
+                                    .Bold().FontSize(8.5f).FontColor("#000000");
                                 estCol.Item().Table(t =>
                                 {
                                     t.ColumnsDefinition(c =>
@@ -418,30 +427,47 @@ public class ReportesConsultaService : IReportesService
                                     t.Cell().Element(CeldaActHdr).Text("Actividades específicas").Bold().FontSize(8);
                                     t.Cell().Element(CeldaActHdr).AlignCenter().Text("Horas").Bold().FontSize(8);
 
-                                    for (var r = 0; r < 4; r++)
+                                    for (var r = 1; r <= 10; r++)
                                     {
-                                        t.Cell().Height(14).Border(0.5f).BorderColor("#E0E0E0");
-                                        t.Cell().Height(14).Border(0.5f).BorderColor("#E0E0E0");
-                                        t.Cell().Height(14).Border(0.5f).BorderColor("#E0E0E0");
+                                        t.Cell().Border(0.5f).BorderColor("#000000").Padding(2).AlignCenter()
+                                            .Text(r.ToString()).FontSize(8).FontColor("#000000");
+                                        t.Cell().Height(13).Border(0.5f).BorderColor("#000000");
+                                        t.Cell().Height(13).Border(0.5f).BorderColor("#000000");
                                     }
+
+                                    t.Cell().ColumnSpan(2).Element(CeldaActHdr).AlignRight().Text("Total").Bold().FontSize(8);
+                                    t.Cell().Element(CeldaActHdr).Text("");
                                 });
 
-                                // Productos y nombre
+                                // Productos y nombre del estudiante propuesto
                                 estCol.Item().Table(t =>
                                 {
-                                    t.ColumnsDefinition(c => c.RelativeColumn());
+                                    t.ColumnsDefinition(c => { c.RelativeColumn(1.4f); c.RelativeColumn(2.6f); });
                                     t.Cell().Element(CeldaLabel)
-                                        .Text("Producto(s) esperado(s)").Bold().FontSize(8.5f).FontColor("#0E2240");
-                                    t.Cell().Element(CeldaValor).MinHeight(22)
-                                        .Text("(Pendiente — dato proveniente del módulo de gestión de propuestas)")
-                                        .FontSize(8.5f).FontColor("#9E9E9E").Italic();
-                                    t.Cell().Background("#F7F9FC").Padding(5).Border(0.5f).BorderColor("#CCCCCC")
-                                        .Text($"Nombre del estudiante: {est.NombreCompleto}   |   Correo: {est.Email}   |   Asignado: {est.FechaAsignacion.LocalDateTime:dd/MM/yyyy}")
-                                        .FontSize(8f).FontColor("#424242");
+                                        .Text("Producto(s) esperado(s)").Bold().FontSize(8.5f).FontColor("#000000");
+                                    t.Cell().Element(CeldaValor).MinHeight(26).Text("");
+                                    t.Cell().Element(CeldaLabel)
+                                        .Text("Nombre del estudiante propuesto").Bold().FontSize(8.5f).FontColor("#000000");
+                                    t.Cell().Element(CeldaValor).MinHeight(18).Text(nombre).FontSize(8.5f);
                                 });
                             });
                         }
                     }
+
+                    col.Item().PaddingTop(8);
+
+                    // ── SOLICITUD DE PARTICIPACIÓN < 2 o > 5 ESTUDIANTES (Opcional) ──
+                    col.Item().Table(table =>
+                    {
+                        table.ColumnsDefinition(c => { c.RelativeColumn(1.4f); c.RelativeColumn(2.6f); });
+                        table.Cell().ColumnSpan(2).Element(CeldaSeccion)
+                            .Text("SOLICITUD DE PARTICIPACIÓN DE MENOS DE 2 O MÁS DE 5 ESTUDIANTES (Opcional)")
+                            .Bold().FontColor("#000000").FontSize(9);
+                        table.Cell().Element(CeldaLabel).Text("Autorizado por:").Bold().FontSize(8.5f);
+                        table.Cell().Element(CeldaValor).MinHeight(22).Text("");
+                        table.Cell().Element(CeldaLabel).Text("Fecha:").Bold().FontSize(8.5f);
+                        table.Cell().Element(CeldaValor).MinHeight(18).Text("");
+                    });
 
                     col.Item().PaddingTop(8);
 
@@ -456,35 +482,27 @@ public class ReportesConsultaService : IReportesService
 
                         table.Cell().ColumnSpan(2).Element(CeldaSeccion)
                             .Text("RECOMENDACIONES Y APROBACIONES")
-                            .Bold().FontColor("#FFFFFF").FontSize(9);
+                            .Bold().FontColor("#000000").FontSize(9);
 
-                        void AprobFila(string etiqueta, string valor, bool pendiente = false)
+                        void AprobFila(string etiqueta, string valor, float minHeight = 20)
                         {
                             table.Cell().Element(CeldaLabel).Text(etiqueta).Bold().FontSize(8.5f);
-                            table.Cell().Element(CeldaValor).MinHeight(20)
-                                .Text(valor).FontSize(8.5f)
-                                .FontColor(pendiente ? "#BDBDBD" : "#424242")
-                                .Italic();
+                            table.Cell().Element(CeldaValor).MinHeight(minHeight)
+                                .Text(valor).FontSize(8.5f).FontColor("#424242");
                         }
 
                         AprobFila("Presentado por:",
                             $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
-                        AprobFila("Firma:", "", pendiente: true);
-                        AprobFila("Recomendaciones de la CPGIC:", "", pendiente: true);
-                        AprobFila("Aprobación de la CPGIC:", "", pendiente: true);
+                        AprobFila("Estudiantes propuestos:",
+                            p.Estudiantes.Count > 0
+                                ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
+                                : "");
+                        AprobFila("Resolución de la CPGIC:", "", 40);
+                        AprobFila("Presidente de la CPGIC:", "", 30);
                         AprobFila("Fecha de aprobación:",
                             p.FechaEnvio.HasValue
                                 ? p.FechaEnvio.Value.LocalDateTime.ToString("dd/MM/yyyy")
                                 : "");
-                        AprobFila("Firma CPGIC:", "", pendiente: true);
-                        AprobFila("Fecha de envío al Subdecano:", "", pendiente: true);
-                        AprobFila("Estudiantes asignados:",
-                            p.Estudiantes.Count > 0
-                                ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
-                                : "Sin estudiantes asignados");
-                        AprobFila("Estado actual:", p.EstadoActual);
-                        AprobFila("Código del sistema:", p.Codigo);
-                        AprobFila("Generado por TIC-FIS:", generado);
                     });
                 });
 
@@ -588,7 +606,7 @@ public class ReportesConsultaService : IReportesService
                             {
                                 c.Item().Text("ESCUELA POLITÉCNICA NACIONAL")
                                     .Bold().FontSize(11).FontColor("#0E2240");
-                                c.Item().Text("Facultad de Ingeniería en Sistemas")
+                                c.Item().Text("Facultad de Ingeniería de Sistemas")
                                     .FontSize(8).FontColor("#616161");
                             });
                             row.ConstantItem(75).AlignRight()
@@ -619,7 +637,8 @@ public class ReportesConsultaService : IReportesService
                             F("Unidad Académica:", "Facultad de Ingeniería en Sistemas (FIS)");
                             F("Carrera:", "Ingeniería en Ciencias de la Computación");
                             F("Proyecto:", p.Titulo);
-                            F("Número de participantes:", p.Estudiantes.Count > 0 ? p.Estudiantes.Count.ToString() : "Por definir");
+                            F("Estudiantes propuestos:", $"{p.EstudiantesPropuestos} de {p.CupoMaximo}");
+                            F("Cupos / Disponible:", $"{p.EstudiantesPropuestos}/{p.CupoMaximo}   —   {(p.Disponible ? "Sí" : "No")}");
                             F("Departamento:", "Departamento de Informática y Ciencias de la Computación");
                             F("Línea de investigación:", "Ingeniería de Software y Sistemas de Información");
                             F("Asignaturas:", "Trabajo de Integración Curricular");

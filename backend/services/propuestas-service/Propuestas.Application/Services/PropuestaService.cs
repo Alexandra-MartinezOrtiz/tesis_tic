@@ -21,6 +21,8 @@ public class PropuestaService : IPropuestaService
     {
         if (!EsDocente(roles))
             throw new UnauthorizedAccessException("Se requiere rol Docente.");
+        if (request.EstudiantesPropuestos < 0 || request.EstudiantesPropuestos > 5)
+            throw new InvalidOperationException("El número de estudiantes propuestos debe estar entre 0 y 5.");
         if (await _repo.CodigoExisteAsync(request.Codigo, null, cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("El código de propuesta ya existe.");
         var docenteId = await _repo.EnsureDocenteAsync(usuarioId, docenteEmail, cancellationToken).ConfigureAwait(false);
@@ -34,8 +36,12 @@ public class PropuestaService : IPropuestaService
         var det = await _repo.GetDetailAsync(propuestaId, cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Propuesta no encontrada.");
         await EnsurePuedeEditarDocenteAsync(usuarioId, roles, det, cancellationToken).ConfigureAwait(false);
-        if (det.EstadoActual != PropuestaEstados.Borrador)
-            throw new InvalidOperationException("Solo se puede editar en estado borrador.");
+        // Se permite editar en borrador o aprobada (las propuestas se crean aprobadas
+        // dentro del alcance del módulo de Consultas y Reportes).
+        if (det.EstadoActual != PropuestaEstados.Borrador && det.EstadoActual != PropuestaEstados.Aprobada)
+            throw new InvalidOperationException("Solo se puede editar en estado borrador o aprobada.");
+        if (request.EstudiantesPropuestos < 0 || request.EstudiantesPropuestos > 5)
+            throw new InvalidOperationException("El número de estudiantes propuestos debe estar entre 0 y 5.");
         await _repo.UpdatePropuestaBasicaAsync(propuestaId, request, cancellationToken).ConfigureAwait(false);
         return await _repo.GetDetailAsync(propuestaId, cancellationToken).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Propuesta no encontrada.");

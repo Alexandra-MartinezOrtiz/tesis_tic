@@ -33,7 +33,10 @@ CREATE TABLE propuestas (
     estado_actual VARCHAR(50) NOT NULL,
     fecha_envio TIMESTAMPTZ,
     fecha_ultima_actualizacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    activa BOOLEAN NOT NULL DEFAULT TRUE
+    activa BOOLEAN NOT NULL DEFAULT TRUE,
+    -- Cantidad de estudiantes propuestos (0..5). Base para cupos y disponibilidad
+    -- en el módulo de Consultas y Reportes.
+    estudiantes_propuestos INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX ix_propuestas_docente ON propuestas (docente_id);

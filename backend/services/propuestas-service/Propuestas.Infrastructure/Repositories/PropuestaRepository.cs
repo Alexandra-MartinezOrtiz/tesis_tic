@@ -55,14 +55,17 @@ public class PropuestaRepository : IPropuestaRepository
             ObjetivoGeneral = request.ObjetivoGeneral,
             Alcance = request.Alcance,
             DocenteId = docenteId,
-            EstadoActual = PropuestaEstados.Borrador,
+            // Alcance del módulo Consultas y Reportes: las propuestas creadas quedan
+            // directamente aprobadas (visibles en Reportes), no en borrador.
+            EstadoActual = PropuestaEstados.Aprobada,
             FechaEnvio = null,
             FechaUltimaActualizacion = now,
             Activa = true,
+            EstudiantesPropuestos = Math.Clamp(request.EstudiantesPropuestos, 0, 5),
         };
         _db.Propuestas.Add(p);
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await AddHistorialAsync(p.Id, null, PropuestaEstados.Borrador, actorUsuarioId, "Creación", cancellationToken).ConfigureAwait(false);
+        await AddHistorialAsync(p.Id, null, PropuestaEstados.Aprobada, actorUsuarioId, "Creación (aprobada)", cancellationToken).ConfigureAwait(false);
         return p.Id;
     }
 
@@ -101,6 +104,7 @@ public class PropuestaRepository : IPropuestaRepository
             p.FechaEnvio,
             p.FechaUltimaActualizacion,
             p.Activa,
+            p.EstudiantesPropuestos,
             est,
             obs);
     }
@@ -115,6 +119,7 @@ public class PropuestaRepository : IPropuestaRepository
         p.Problema = request.Problema;
         p.ObjetivoGeneral = request.ObjetivoGeneral;
         p.Alcance = request.Alcance;
+        p.EstudiantesPropuestos = Math.Clamp(request.EstudiantesPropuestos, 0, 5);
         p.FechaUltimaActualizacion = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -160,7 +165,7 @@ public class PropuestaRepository : IPropuestaRepository
             .OrderByDescending(p => p.FechaUltimaActualizacion)
             .Skip(skip)
             .Take(take)
-            .Select(p => new PropuestaListItemDto(p.Id, p.Codigo, p.Titulo, p.EstadoActual, p.FechaUltimaActualizacion, p.Activa, p.Docente.Email))
+            .Select(p => new PropuestaListItemDto(p.Id, p.Codigo, p.Titulo, p.EstadoActual, p.FechaUltimaActualizacion, p.Activa, p.Docente.Email, p.EstudiantesPropuestos))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
         return list;

@@ -6,7 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { PropuestaReporteItemDto } from '../../../core/models/reporte.models';
 
-type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 'Pendiente';
+type FilterDisp = '' | 'disponibles' | 'nodisponibles';
 
 @Component({
   selector: 'app-reportes-home',
@@ -47,8 +47,8 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
                       padding:10px 14px;font-size:.78rem;line-height:1.6;
                       box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:100">
             <strong style="display:block;margin-bottom:4px">Guía rápida</strong>
-            • Usa los botones de estado para filtrar propuestas<br>
-            • Escribe en el buscador para filtrar por código, título o docente<br>
+            • Usa los filtros de disponibilidad (Todas / Disponibles / No disponibles)<br>
+            • Escribe en el buscador para filtrar por código, título o proponente<br>
             • Presiona <kbd style="background:#fff;color:#0E2240;padding:1px 4px;border-radius:3px;font-size:.72rem">/</kbd> para enfocar el buscador<br>
             • Presiona <kbd style="background:#fff;color:#0E2240;padding:1px 4px;border-radius:3px;font-size:.72rem">Esc</kbd> para limpiar los filtros<br>
             • Haz clic en <strong>Ver →</strong> para ver el formulario F_AA_233A
@@ -82,29 +82,21 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
 
     <!-- Counter cards -->
     <div class="counter-row">
-      <div class="counter-card cc-total" style="cursor:pointer" (click)="setEstado('')">
+      <div class="counter-card cc-total" style="cursor:pointer" (click)="setDisp('')">
         <span class="cc-value">{{ propuestas().length }}</span>
-        <span class="cc-label">Total</span>
+        <span class="cc-label">Total de propuestas aprobadas</span>
       </div>
-      <div class="counter-card cc-aprobada" style="cursor:pointer" (click)="setEstado('Aprobada')">
-        <span class="cc-value">{{ contar('Aprobada') }}</span>
-        <span class="cc-label">Aprobadas</span>
+      <div class="counter-card cc-aprobada" style="cursor:pointer" (click)="setDisp('disponibles')">
+        <span class="cc-value">{{ totalDisponibles() }}</span>
+        <span class="cc-label">Disponibles</span>
       </div>
-      <div class="counter-card cc-revision" style="cursor:pointer" (click)="setEstado('EnRevision')">
-        <span class="cc-value">{{ contar('EnRevision') }}</span>
-        <span class="cc-label">En revisión</span>
+      <div class="counter-card cc-rechazada" style="cursor:pointer" (click)="setDisp('nodisponibles')">
+        <span class="cc-value">{{ totalNoDisponibles() }}</span>
+        <span class="cc-label">No disponibles</span>
       </div>
-      <div class="counter-card cc-pendiente" style="cursor:pointer" (click)="setEstado('Pendiente')">
-        <span class="cc-value">{{ contar('Pendiente') }}</span>
-        <span class="cc-label">Pendientes</span>
-      </div>
-      <div class="counter-card cc-rechazada" style="cursor:pointer" (click)="setEstado('Rechazada')">
-        <span class="cc-value">{{ contar('Rechazada') }}</span>
-        <span class="cc-label">Rechazadas</span>
-      </div>
-      <div class="counter-card cc-borrador" style="cursor:pointer" (click)="setEstado('Borrador')">
-        <span class="cc-value">{{ contar('Borrador') }}</span>
-        <span class="cc-label">Borradores</span>
+      <div class="counter-card cc-pendiente">
+        <span class="cc-value">{{ totalCuposOcupados() }}</span>
+        <span class="cc-label">Cupos ocupados</span>
       </div>
     </div>
 
@@ -113,21 +105,12 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
       <div class="sl">Filtrar propuestas</div>
 
       <div class="stat-btn-row">
-        <button class="stat-btn sb-todos"    [class.active]="filtroEstado() === ''"          (click)="setEstado('')">Todas</button>
-        <button class="stat-btn sb-aprobada" [class.active]="filtroEstado() === 'Aprobada'"  (click)="setEstado('Aprobada')">
-          <span class="dot"></span>Aprobadas
+        <button class="stat-btn sb-todos"    [class.active]="filtroDisp() === ''"             (click)="setDisp('')">Todas</button>
+        <button class="stat-btn sb-aprobada" [class.active]="filtroDisp() === 'disponibles'"   (click)="setDisp('disponibles')">
+          <span class="dot"></span>Disponibles
         </button>
-        <button class="stat-btn sb-revision" [class.active]="filtroEstado() === 'EnRevision'" (click)="setEstado('EnRevision')">
-          <span class="dot"></span>En revisión
-        </button>
-        <button class="stat-btn sb-pendiente" [class.active]="filtroEstado() === 'Pendiente'" (click)="setEstado('Pendiente')">
-          <span class="dot"></span>Pendientes
-        </button>
-        <button class="stat-btn sb-rechazada" [class.active]="filtroEstado() === 'Rechazada'" (click)="setEstado('Rechazada')">
-          <span class="dot"></span>Rechazadas
-        </button>
-        <button class="stat-btn sb-borrador"  [class.active]="filtroEstado() === 'Borrador'"  (click)="setEstado('Borrador')">
-          <span class="dot"></span>Borradores
+        <button class="stat-btn sb-rechazada" [class.active]="filtroDisp() === 'nodisponibles'" (click)="setDisp('nodisponibles')">
+          <span class="dot"></span>No disponibles
         </button>
       </div>
 
@@ -149,9 +132,9 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
             <th>Código</th>
             <th>Título</th>
             <th>Proponente</th>
-            <th>Estado</th>
-            <th>Últ. actualización</th>
+            <th>Cupos</th>
             <th>Disponible</th>
+            <th>Últ. actualización</th>
             <th></th>
           </tr>
         </thead>
@@ -173,18 +156,18 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
               <td style="max-width:240px;font-weight:500;line-height:1.4">{{ p.titulo }}</td>
               <td style="font-size:.82rem;color:#616161">{{ p.docenteEmail || '—' }}</td>
               <td>
-                <span class="badge" [ngClass]="badgeClass(p.estadoActual)">{{ estadoLabel(p.estadoActual) }}</span>
+                <span style="font-size:.82rem;font-weight:700;color:#0E2240">{{ cupos(p) }}</span>
+              </td>
+              <td>
+                <span style="font-size:.78rem;font-weight:700"
+                  [style.color]="disponible(p) ? 'var(--green)' : 'var(--gray)'">
+                  {{ disponible(p) ? 'Sí' : 'No' }}
+                </span>
               </td>
               <td style="font-size:.82rem;color:#757575;white-space:nowrap">{{ p.fechaUltimaActualizacion | date:'dd/MM/yyyy' }}</td>
               <td>
-                <span style="font-size:.78rem;font-weight:700"
-                  [style.color]="p.activa ? 'var(--green)' : 'var(--gray)'">
-                  {{ p.activa ? 'Sí' : 'No' }}
-                </span>
-              </td>
-              <td>
-                <a [routerLink]="['/reportes', p.id]" class="btn btn-ghost btn-sm">
-                  Ver &rarr;
+                <a [routerLink]="['/reportes', p.id]" class="btn btn-ghost btn-sm" title="Ver detalle de la propuesta aprobada">
+                  Ver detalle &rarr;
                 </a>
               </td>
             </tr>
@@ -204,8 +187,8 @@ type FilterEstado = '' | 'Borrador' | 'EnRevision' | 'Aprobada' | 'Rechazada' | 
         Mostrando <strong>{{ propuestasFiltradas().length }}</strong> de
         <strong>{{ propuestas().length }}</strong> propuestas
       </span>
-      <span *ngIf="filtroEstado()" class="badge badge-revision" style="font-size:.78rem">
-        Filtro: {{ estadoLabel(filtroEstado()) }}
+      <span *ngIf="filtroDisp()" class="badge badge-revision" style="font-size:.78rem">
+        Filtro: {{ dispLabel(filtroDisp()) }}
       </span>
     </div>
   `,
@@ -227,10 +210,12 @@ export class ReportesHomeComponent implements OnInit {
   mostrarAyuda = false;
   toastVisible  = false;
 
+  readonly cupoMaximo = 5;
+
   loading = signal(true);
   error = signal('');
   propuestas = signal<PropuestaReporteItemDto[]>([]);
-  filtroEstado = signal<FilterEstado>('');
+  filtroDisp = signal<FilterDisp>('');
 
   filtrosForm = this.fb.nonNullable.group({ busqueda: [''] });
 
@@ -240,17 +225,25 @@ export class ReportesHomeComponent implements OnInit {
   );
 
   propuestasFiltradas = computed(() => {
-    const estado = this.filtroEstado();
+    const disp = this.filtroDisp();
     const busq = (this.busquedaValue() ?? '').toLowerCase().trim();
     return this.propuestas().filter(p => {
-      const matchEstado = !estado || p.estadoActual.toLowerCase() === estado.toLowerCase();
+      const matchDisp =
+        !disp ||
+        (disp === 'disponibles' && this.disponible(p)) ||
+        (disp === 'nodisponibles' && !this.disponible(p));
       const matchBusq = !busq ||
         p.codigo.toLowerCase().includes(busq) ||
         p.titulo.toLowerCase().includes(busq) ||
         (p.docenteEmail ?? '').toLowerCase().includes(busq);
-      return matchEstado && matchBusq;
+      return matchDisp && matchBusq;
     });
   });
+
+  // Indicadores superiores del módulo de Consultas y Reportes
+  totalDisponibles    = computed(() => this.propuestas().filter(p => this.disponible(p)).length);
+  totalNoDisponibles  = computed(() => this.propuestas().filter(p => !this.disponible(p)).length);
+  totalCuposOcupados  = computed(() => this.propuestas().reduce((acc, p) => acc + this.estudiantes(p), 0));
 
   ngOnInit() { this.cargar(); }
 
@@ -268,7 +261,7 @@ export class ReportesHomeComponent implements OnInit {
 
   limpiar() {
     this.filtrosForm.reset();
-    this.filtroEstado.set('');
+    this.filtroDisp.set('');
   }
 
   imprimir() {
@@ -280,23 +273,29 @@ export class ReportesHomeComponent implements OnInit {
 
   trackById(_: number, p: PropuestaReporteItemDto) { return p.id; }
 
-  setEstado(e: FilterEstado) { this.filtroEstado.set(e); }
+  setDisp(d: FilterDisp) { this.filtroDisp.set(d); }
 
-  contar(estado: string) { return this.propuestas().filter(p => p.estadoActual === estado).length; }
-
-  badgeClass(estado: string): string {
-    const map: Record<string, string> = {
-      Borrador: 'badge-borrador', EnRevision: 'badge-revision',
-      Aprobada: 'badge-aprobada', Rechazada: 'badge-rechazada', Pendiente: 'badge-pendiente',
-    };
-    return map[estado] ?? 'badge-borrador';
+  // Estudiantes asignados/propuestos de la propuesta (0..5)
+  estudiantes(p: PropuestaReporteItemDto): number {
+    const n = p.estudiantesPropuestos ?? 0;
+    return Math.min(Math.max(n, 0), this.cupoMaximo);
   }
 
-  estadoLabel(estado: string): string {
-    const map: Record<string, string> = {
-      Borrador: 'Borrador', EnRevision: 'En revisión',
-      Aprobada: 'Aprobada', Rechazada: 'Rechazada', Pendiente: 'Pendiente',
+  // Cupos en formato "X/5"
+  cupos(p: PropuestaReporteItemDto): string {
+    const max = p.cupoMaximo ?? this.cupoMaximo;
+    return `${this.estudiantes(p)}/${max}`;
+  }
+
+  // Disponible si hay cupos libres (estudiantes asignados < máximo)
+  disponible(p: PropuestaReporteItemDto): boolean {
+    return this.estudiantes(p) < (p.cupoMaximo ?? this.cupoMaximo);
+  }
+
+  dispLabel(disp: FilterDisp): string {
+    const map: Record<FilterDisp, string> = {
+      '': 'Todas', disponibles: 'Disponibles', nodisponibles: 'No disponibles',
     };
-    return map[estado] ?? estado;
+    return map[disp] ?? 'Todas';
   }
 }

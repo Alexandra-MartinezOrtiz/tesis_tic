@@ -7,7 +7,8 @@ public record PropuestaListItemDto(
     string EstadoActual,
     DateTimeOffset FechaUltimaActualizacion,
     bool Activa,
-    string? DocenteEmail);
+    string? DocenteEmail,
+    int EstudiantesPropuestos);
 
 public record PropuestaDetailDto(
     long Id,
@@ -23,6 +24,7 @@ public record PropuestaDetailDto(
     DateTimeOffset? FechaEnvio,
     DateTimeOffset FechaUltimaActualizacion,
     bool Activa,
+    int EstudiantesPropuestos,
     IReadOnlyList<EstudianteAsignadoDto> Estudiantes,
     IReadOnlyList<ObservacionDto> Observaciones);
 
@@ -35,14 +37,16 @@ public record CreatePropuestaRequest(
     string? Descripcion,
     string? Problema,
     string? ObjetivoGeneral,
-    string? Alcance);
+    string? Alcance,
+    int EstudiantesPropuestos = 0);
 
 public record UpdatePropuestaRequest(
     string Titulo,
     string? Descripcion,
     string? Problema,
     string? ObjetivoGeneral,
-    string? Alcance);
+    string? Alcance,
+    int EstudiantesPropuestos = 0);
 
 public record AsignarEstudiantesRequest(IReadOnlyList<long> EstudianteIds);
 

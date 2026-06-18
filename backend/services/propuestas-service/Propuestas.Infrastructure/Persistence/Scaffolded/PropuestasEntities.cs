@@ -34,6 +34,11 @@ public class Propuesta
     public DateTimeOffset? FechaEnvio { get; set; }
     public DateTimeOffset FechaUltimaActualizacion { get; set; }
     public bool Activa { get; set; }
+    /// <summary>
+    /// Cantidad de estudiantes propuestos al crear la propuesta (0..5).
+    /// Usado por el módulo de Consultas y Reportes para calcular cupos y disponibilidad.
+    /// </summary>
+    public int EstudiantesPropuestos { get; set; }
     public Docente Docente { get; set; } = null!;
     public ICollection<PropuestaEstudiante> PropuestaEstudiantes { get; set; } = new List<PropuestaEstudiante>();
     public ICollection<PropuestaObservacion> PropuestaObservaciones { get; set; } = new List<PropuestaObservacion>();
