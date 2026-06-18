@@ -1,0 +1,66 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: azure-vm-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_VM_HOST: ${{ secrets.AZURE_VM_HOST }}
+      AZURE_VM_USER: ${{ secrets.AZURE_VM_USER }}
+      AZURE_VM_SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY }}
+      AZURE_VM_PORT: ${{ secrets.AZURE_VM_PORT || '22' }}
+
+    steps:
+      - name: Check deployment secrets
+        id: deployment-secrets
+        run: |
+          if [ -z "$AZURE_VM_HOST" ] || [ -z "$AZURE_VM_USER" ] || [ -z "$AZURE_VM_SSH_KEY" ]; then
+            echo "Azure VM deployment skipped. Configure AZURE_VM_HOST, AZURE_VM_USER and AZURE_VM_SSH_KEY secrets."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Configure SSH
+        if: steps.deployment-secrets.outputs.ready == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$AZURE_VM_SSH_KEY" > ~/.ssh/azure_vm_key
+          chmod 600 ~/.ssh/azure_vm_key
+          ssh-keyscan -p "$AZURE_VM_PORT" "$AZURE_VM_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy on Azure VM
+        if: steps.deployment-secrets.outputs.ready == 'true'
+        run: |
+          ssh -i ~/.ssh/azure_vm_key -p "$AZURE_VM_PORT" "$AZURE_VM_USER@$AZURE_VM_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+
+          REPO_URL="git@github.com:Alexandra-MartinezOrtiz/tesis_tic.git"
+          BRANCH="main"
+          APP_DIR="$HOME/proyecto/tesis_tic"
+
+          mkdir -p "$(dirname "$APP_DIR")"
+
+          if [ ! -d "$APP_DIR/.git" ]; then
+            git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
+          fi
+
+          cd "$APP_DIR"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+
+          docker compose down
+          docker compose up -d --build
+          docker compose ps
+          REMOTE

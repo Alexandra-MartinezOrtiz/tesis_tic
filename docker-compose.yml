@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - ticfis_pgdata:/var/lib/postgresql/data
       - ./backend/docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/00-init-databases.sh:ro
@@ -93,7 +93,7 @@ services:
       ReverseProxy__Clusters__reportes_cluster__HttpRequest__Version: "1.1"
       ReverseProxy__Clusters__reportes_cluster__HttpRequest__VersionPolicy: RequestVersionExact
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     depends_on:
       identity-api:
         condition: service_healthy
