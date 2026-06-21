@@ -39,6 +39,20 @@ public class Propuesta
     /// Usado por el módulo de Consultas y Reportes para calcular cupos y disponibilidad.
     /// </summary>
     public int EstudiantesPropuestos { get; set; }
+    /// <summary>Carrera de la FIS seleccionada en el formulario (ej. "Software").</summary>
+    public string? Carrera { get; set; }
+    /// <summary>Asignaturas seleccionadas, una por línea con formato "Nombre (CÓDIGO)".</summary>
+    public string? Asignaturas { get; set; }
+    /// <summary>"Autorizado por" de la solicitud de participación (&lt;2 o &gt;5 estudiantes).</summary>
+    public string? AutorizadoPor { get; set; }
+    /// <summary>Fecha de esa autorización (texto ISO yyyy-MM-dd).</summary>
+    public string? FechaAutorizacion { get; set; }
+    // Sección "Recomendaciones y aprobaciones" del formulario F_AA_233A.
+    public string? PresentadoPor { get; set; }
+    public string? EstudiantesNombres { get; set; }
+    public string? ResolucionCpgic { get; set; }
+    public string? PresidenteCpgic { get; set; }
+    public string? FechaAprobacion { get; set; }
     public Docente Docente { get; set; } = null!;
     public ICollection<PropuestaEstudiante> PropuestaEstudiantes { get; set; } = new List<PropuestaEstudiante>();
     public ICollection<PropuestaObservacion> PropuestaObservaciones { get; set; } = new List<PropuestaObservacion>();

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { PropuestaService } from '../../../core/services/propuesta.service';
+import { CARRERAS_FIS, Asignatura } from '../../../core/constants/carreras-fis';
 
 @Component({
   selector: 'app-propuesta-form',
@@ -50,6 +51,25 @@ import { PropuestaService } from '../../../core/services/propuesta.service';
     .f-table td.val input::placeholder,
     .f-table td.val textarea::placeholder { color:#BDBDBD; }
     .f-table td.val.fijo { color:#000; }
+    .f-select {
+      width:100%; border:1px solid #CCC; border-radius:4px;
+      padding:.3rem .5rem; font-size:0.82rem; font-family:Arial,sans-serif;
+      color:#212121; background:#fff; outline:none;
+    }
+    .f-select:focus { border-color:#0E2240; }
+    .asig-hint { font-size:0.78rem; color:#90A4AE; font-style:italic; }
+    .asig-lista {
+      display:grid; grid-template-columns:1fr 1fr; gap:2px 16px;
+      max-height:220px; overflow-y:auto; padding:2px 0;
+    }
+    .asig-item {
+      display:flex; align-items:flex-start; gap:6px;
+      font-size:0.78rem; color:#212121; cursor:pointer; padding:1px 0;
+    }
+    .asig-item input { margin-top:2px; }
+    .asig-item em { color:#607D8B; font-style:normal; font-size:0.72rem; }
+    .asig-resumen { font-size:0.75rem; color:#2E7D32; font-weight:600; margin-top:4px; }
+    @media (max-width:600px) { .asig-lista { grid-template-columns:1fr; } }
     .f-table td.contenido {
       background:#fff; padding:6px 8px;
       border:0.5px solid #000; vertical-align:top;
@@ -159,7 +179,12 @@ import { PropuestaService } from '../../../core/services/propuesta.service';
             </tr>
             <tr>
               <td class="lbl">Carrera:</td>
-              <td class="val fijo">Ingeniería de Software</td>
+              <td class="val">
+                <select class="f-select" formControlName="carrera" (change)="onCarreraChange()">
+                  <option value="">Seleccione la carrera…</option>
+                  <option *ngFor="let c of carreras" [value]="c.nombre">{{ c.nombre }}</option>
+                </select>
+              </td>
             </tr>
 
             <!-- Título del proyecto (editable) -->
@@ -196,8 +221,23 @@ import { PropuestaService } from '../../../core/services/propuesta.service';
               <td class="val fijo">Ingeniería de Software</td>
             </tr>
             <tr>
-              <td class="lbl">Asignaturas:</td>
-              <td class="val fijo" style="white-space:pre-line">{{ asignaturas }}</td>
+              <td class="lbl" style="vertical-align:top;padding-top:6px">Asignaturas:</td>
+              <td class="val">
+                <div *ngIf="!f['carrera'].value" class="asig-hint">
+                  Seleccione primero la carrera para ver sus asignaturas.
+                </div>
+                <div *ngIf="f['carrera'].value" class="asig-lista">
+                  <label *ngFor="let a of asignaturasDisponibles()" class="asig-item">
+                    <input type="checkbox"
+                           [checked]="asignaturaMarcada(a.codigo)"
+                           (change)="toggleAsignatura(a.codigo)"/>
+                    <span>{{ a.nombre }} <em>({{ a.codigo }})</em></span>
+                  </label>
+                </div>
+                <div *ngIf="f['carrera'].value && asignaturasSel().length" class="asig-resumen">
+                  {{ asignaturasSel().length }} asignatura(s) seleccionada(s).
+                </div>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Profesor:</td>
@@ -328,11 +368,16 @@ import { PropuestaService } from '../../../core/services/propuesta.service';
           <tbody>
             <tr>
               <td class="lbl" style="width:32%">Autorizado por:</td>
-              <td class="val" style="height:30px"></td>
+              <td class="val">
+                <input formControlName="autorizadoPor"
+                       placeholder="Nombre de quien autoriza (opcional)…"/>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Fecha:</td>
-              <td class="val" style="height:24px"></td>
+              <td class="val">
+                <input type="date" formControlName="fechaAutorizacion" style="max-width:170px"/>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -345,23 +390,37 @@ import { PropuestaService } from '../../../core/services/propuesta.service';
           <tbody>
             <tr>
               <td class="lbl" style="width:32%">Presentado por:</td>
-              <td class="val fijo">Asignado automáticamente al guardar</td>
+              <td class="val">
+                <input formControlName="presentadoPor"
+                       placeholder="Nombre de quien presenta (o se asigna al docente)…"/>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Estudiantes propuestos:</td>
-              <td class="val" style="height:30px"></td>
+              <td class="val">
+                <input formControlName="estudiantesNombres"
+                       placeholder="Nombres de los estudiantes propuestos…"/>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Resolución de la CPGIC:</td>
-              <td class="val" style="height:45px"></td>
+              <td class="val">
+                <textarea formControlName="resolucionCpgic" rows="2"
+                          placeholder="Resolución / número de acta de la CPGIC…"></textarea>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Presidente de la CPGIC:</td>
-              <td class="val" style="height:35px"></td>
+              <td class="val">
+                <input formControlName="presidenteCpgic"
+                       placeholder="Nombre del presidente de la CPGIC…"/>
+              </td>
             </tr>
             <tr>
               <td class="lbl">Fecha de aprobación:</td>
-              <td class="val fijo">—</td>
+              <td class="val">
+                <input type="date" formControlName="fechaAprobacion" style="max-width:170px"/>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -398,26 +457,53 @@ export class PropuestaFormComponent implements OnInit {
   readonly letras = ['A', 'B', 'C', 'D', 'E'];
   readonly actividades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-  // Asignaturas fijas, idénticas al formulario oficial F_AA_233A.
-  readonly asignaturas =
-    'Fundamentos de bases de datos (ISWD453)\n' +
-    'Diseño de Software (ISWD523)\n' +
-    'Metodologías ágiles (ISWD613)\n' +
-    'Calidad de Software (ISWD652)\n' +
-    'Aplicaciones Web Avanzadas (ISWD813)\n' +
-    'Usabilidad y Accesibilidad (ISWD732)';
+  // Carreras de grado vigentes de la FIS (EPN) con sus asignaturas reales.
+  readonly carreras = CARRERAS_FIS;
+
+  // Asignaturas seleccionadas (códigos). Se persisten como texto y se reflejan en Reportes.
+  asignaturasSel = signal<string[]>([]);
 
   form = this.fb.nonNullable.group({
     codigo:               ['', Validators.required],
     titulo:               ['', Validators.required],
+    carrera:              [''],
     descripcion:          [''],
     problema:             [''],
     objetivoGeneral:      [''],
     alcance:              [''],
     estudiantesPropuestos: [0, [Validators.required, Validators.min(0), Validators.max(5)]],
+    autorizadoPor:        [''],
+    fechaAutorizacion:    [''],
+    presentadoPor:        [''],
+    estudiantesNombres:   [''],
+    resolucionCpgic:      [''],
+    presidenteCpgic:      [''],
+    fechaAprobacion:      [''],
   });
 
   get f() { return this.form.controls; }
+
+  // Asignaturas disponibles según la carrera elegida.
+  asignaturasDisponibles(): Asignatura[] {
+    const nombre = this.form.controls.carrera.value;
+    return this.carreras.find(c => c.nombre === nombre)?.asignaturas ?? [];
+  }
+
+  // Al cambiar de carrera se limpian las asignaturas seleccionadas previas.
+  onCarreraChange() {
+    this.asignaturasSel.set([]);
+  }
+
+  asignaturaMarcada(codigo: string): boolean {
+    return this.asignaturasSel().includes(codigo);
+  }
+
+  toggleAsignatura(codigo: string) {
+    const actual = this.asignaturasSel();
+    this.asignaturasSel.set(
+      actual.includes(codigo) ? actual.filter(c => c !== codigo) : [...actual, codigo],
+    );
+  }
 
   // Bloques de estudiante (A, B, C…) según el número de participantes indicado.
   slots(): string[] {
@@ -433,10 +519,27 @@ export class PropuestaFormComponent implements OnInit {
       this.propuestaId = Number(id);
       this.form.controls.codigo.disable();
       this.svc.getById(this.propuestaId).subscribe({
-        next:  (p) => this.form.patchValue(p),
+        next:  (p) => {
+          this.form.patchValue(p);
+          // Reconstruye la selección de asignaturas a partir de los códigos guardados.
+          const codigos = (p.asignaturas ?? '').match(/\(([A-Z]{4}\d{3})\)/g)
+            ?.map(s => s.replace(/[()]/g, '')) ?? [];
+          this.asignaturasSel.set(codigos);
+        },
         error: ()  => this.error.set('No se pudo cargar la propuesta.'),
       });
     }
+  }
+
+  // Convierte los códigos seleccionados en texto "Nombre (CÓDIGO)" por línea,
+  // que es lo que se guarda y se muestra tal cual en el módulo de Reportes.
+  private construirAsignaturasTexto(): string {
+    const disponibles = this.asignaturasDisponibles();
+    return this.asignaturasSel()
+      .map(cod => disponibles.find(a => a.codigo === cod))
+      .filter((a): a is Asignatura => !!a)
+      .map(a => `${a.nombre} (${a.codigo})`)
+      .join('\n');
   }
 
   submit() {
@@ -446,13 +549,30 @@ export class PropuestaFormComponent implements OnInit {
     const v = this.form.getRawValue();
     const estudiantesPropuestos = Number(v.estudiantesPropuestos) || 0;
 
+    // Datos académicos del formulario que ahora se persisten y se reflejan en Reportes.
+    const academicos = {
+      carrera: v.carrera || undefined,
+      asignaturas: this.construirAsignaturasTexto() || undefined,
+      autorizadoPor: v.autorizadoPor || undefined,
+      fechaAutorizacion: v.fechaAutorizacion || undefined,
+      presentadoPor: v.presentadoPor || undefined,
+      estudiantesNombres: v.estudiantesNombres || undefined,
+      resolucionCpgic: v.resolucionCpgic || undefined,
+      presidenteCpgic: v.presidenteCpgic || undefined,
+      fechaAprobacion: v.fechaAprobacion || undefined,
+    };
+
     const call$ = this.esEdicion
       ? this.svc.update(this.propuestaId, {
           titulo: v.titulo, descripcion: v.descripcion,
           problema: v.problema, objetivoGeneral: v.objetivoGeneral, alcance: v.alcance,
-          estudiantesPropuestos,
+          estudiantesPropuestos, ...academicos,
         })
-      : this.svc.create({ ...v, estudiantesPropuestos });
+      : this.svc.create({
+          codigo: v.codigo, titulo: v.titulo, descripcion: v.descripcion,
+          problema: v.problema, objetivoGeneral: v.objetivoGeneral, alcance: v.alcance,
+          estudiantesPropuestos, ...academicos,
+        });
 
     call$.subscribe({
       next:  (res: any) => this.router.navigate(['/propuestas', this.esEdicion ? this.propuestaId : res?.id]),

@@ -62,6 +62,15 @@ public class PropuestaRepository : IPropuestaRepository
             FechaUltimaActualizacion = now,
             Activa = true,
             EstudiantesPropuestos = Math.Clamp(request.EstudiantesPropuestos, 0, 5),
+            Carrera = request.Carrera,
+            Asignaturas = request.Asignaturas,
+            AutorizadoPor = request.AutorizadoPor,
+            FechaAutorizacion = request.FechaAutorizacion,
+            PresentadoPor = request.PresentadoPor,
+            EstudiantesNombres = request.EstudiantesNombres,
+            ResolucionCpgic = request.ResolucionCpgic,
+            PresidenteCpgic = request.PresidenteCpgic,
+            FechaAprobacion = request.FechaAprobacion,
         };
         _db.Propuestas.Add(p);
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -106,7 +115,16 @@ public class PropuestaRepository : IPropuestaRepository
             p.Activa,
             p.EstudiantesPropuestos,
             est,
-            obs);
+            obs,
+            p.Carrera,
+            p.Asignaturas,
+            p.AutorizadoPor,
+            p.FechaAutorizacion,
+            p.PresentadoPor,
+            p.EstudiantesNombres,
+            p.ResolucionCpgic,
+            p.PresidenteCpgic,
+            p.FechaAprobacion);
     }
 
     public async Task UpdatePropuestaBasicaAsync(long propuestaId, UpdatePropuestaRequest request, CancellationToken cancellationToken = default)
@@ -120,6 +138,15 @@ public class PropuestaRepository : IPropuestaRepository
         p.ObjetivoGeneral = request.ObjetivoGeneral;
         p.Alcance = request.Alcance;
         p.EstudiantesPropuestos = Math.Clamp(request.EstudiantesPropuestos, 0, 5);
+        p.Carrera = request.Carrera;
+        p.Asignaturas = request.Asignaturas;
+        p.AutorizadoPor = request.AutorizadoPor;
+        p.FechaAutorizacion = request.FechaAutorizacion;
+        p.PresentadoPor = request.PresentadoPor;
+        p.EstudiantesNombres = request.EstudiantesNombres;
+        p.ResolucionCpgic = request.ResolucionCpgic;
+        p.PresidenteCpgic = request.PresidenteCpgic;
+        p.FechaAprobacion = request.FechaAprobacion;
         p.FechaUltimaActualizacion = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

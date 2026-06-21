@@ -70,10 +70,14 @@ import { PropuestaDetailDto, ESTADOS_PROPUESTA } from '../../../core/models/prop
       <div class="card" style="margin-bottom:1rem">
         <h3 style="margin:0 0 1rem">Datos generales</h3>
         <dl class="dl-grid">
+          <dt>Carrera</dt><dd>{{ p.carrera || '—' }}</dd>
+          <dt>Asignaturas</dt><dd style="white-space:pre-line">{{ p.asignaturas || '—' }}</dd>
           <dt>Descripción</dt><dd>{{ p.descripcion || '—' }}</dd>
           <dt>Problema</dt><dd>{{ p.problema || '—' }}</dd>
           <dt>Objetivo general</dt><dd>{{ p.objetivoGeneral || '—' }}</dd>
           <dt>Alcance</dt><dd>{{ p.alcance || '—' }}</dd>
+          <dt *ngIf="p.autorizadoPor">Autorizado por</dt>
+          <dd *ngIf="p.autorizadoPor">{{ p.autorizadoPor }}<span *ngIf="p.fechaAutorizacion"> · {{ p.fechaAutorizacion }}</span></dd>
           <dt>Fecha de envío</dt><dd>{{ (p.fechaEnvio | date:'dd/MM/yyyy') || '—' }}</dd>
           <dt>Última actualización</dt><dd>{{ p.fechaUltimaActualizacion | date:'dd/MM/yyyy HH:mm' }}</dd>
         </dl>

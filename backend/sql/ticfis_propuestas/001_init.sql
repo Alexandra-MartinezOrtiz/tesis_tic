@@ -36,7 +36,19 @@ CREATE TABLE propuestas (
     activa BOOLEAN NOT NULL DEFAULT TRUE,
     -- Cantidad de estudiantes propuestos (0..5). Base para cupos y disponibilidad
     -- en el módulo de Consultas y Reportes.
-    estudiantes_propuestos INTEGER NOT NULL DEFAULT 0
+    estudiantes_propuestos INTEGER NOT NULL DEFAULT 0,
+    -- Datos académicos del formulario F_AA_233A (carrera de la FIS y asignaturas
+    -- seleccionadas) más la solicitud de participación <2 o >5 estudiantes.
+    carrera VARCHAR(150),
+    asignaturas TEXT,
+    autorizado_por VARCHAR(200),
+    fecha_autorizacion VARCHAR(20),
+    -- Sección "Recomendaciones y aprobaciones" del formulario F_AA_233A.
+    presentado_por VARCHAR(200),
+    estudiantes_nombres TEXT,
+    resolucion_cpgic TEXT,
+    presidente_cpgic VARCHAR(200),
+    fecha_aprobacion VARCHAR(20)
 );
 
 CREATE INDEX ix_propuestas_docente ON propuestas (docente_id);

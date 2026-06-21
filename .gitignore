@@ -1,8 +1,14 @@
-**/bin/
-**/obj/
-**/node_modules/
-**/dist/
-**/.angular/
+﻿# .NET
+bin/
+obj/
 *.user
-*.suo
-**/.vs/
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# IDE / SO
+.vs/
+.vscode/
+Thumbs.db

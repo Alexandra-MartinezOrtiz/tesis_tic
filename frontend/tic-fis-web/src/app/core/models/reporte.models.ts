@@ -35,6 +35,15 @@ export interface PropuestaReporteDetalleDto {
   cupoMaximo: number;
   disponible: boolean;
   estudiantes: EstudianteReporteDto[];
+  carrera?: string;
+  asignaturas?: string;
+  autorizadoPor?: string;
+  fechaAutorizacion?: string;
+  presentadoPor?: string;
+  estudiantesNombres?: string;
+  resolucionCpgic?: string;
+  presidenteCpgic?: string;
+  fechaAprobacion?: string;
 }
 
 export interface FiltrosReporte {

@@ -39,6 +39,15 @@ export interface PropuestaDetailDto {
   estudiantesPropuestos?: number;
   estudiantes: EstudianteAsignadoDto[];
   observaciones: ObservacionDto[];
+  carrera?: string;
+  asignaturas?: string;
+  autorizadoPor?: string;
+  fechaAutorizacion?: string;
+  presentadoPor?: string;
+  estudiantesNombres?: string;
+  resolucionCpgic?: string;
+  presidenteCpgic?: string;
+  fechaAprobacion?: string;
 }
 
 export interface CreatePropuestaRequest {
@@ -49,6 +58,15 @@ export interface CreatePropuestaRequest {
   objetivoGeneral?: string;
   alcance?: string;
   estudiantesPropuestos?: number;
+  carrera?: string;
+  asignaturas?: string;
+  autorizadoPor?: string;
+  fechaAutorizacion?: string;
+  presentadoPor?: string;
+  estudiantesNombres?: string;
+  resolucionCpgic?: string;
+  presidenteCpgic?: string;
+  fechaAprobacion?: string;
 }
 
 export interface UpdatePropuestaRequest {
@@ -58,6 +76,15 @@ export interface UpdatePropuestaRequest {
   objetivoGeneral?: string;
   alcance?: string;
   estudiantesPropuestos?: number;
+  carrera?: string;
+  asignaturas?: string;
+  autorizadoPor?: string;
+  fechaAutorizacion?: string;
+  presentadoPor?: string;
+  estudiantesNombres?: string;
+  resolucionCpgic?: string;
+  presidenteCpgic?: string;
+  fechaAprobacion?: string;
 }
 
 export interface TransicionRequest {

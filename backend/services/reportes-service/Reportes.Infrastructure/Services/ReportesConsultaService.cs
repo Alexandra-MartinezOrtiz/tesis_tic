@@ -128,7 +128,16 @@ public class ReportesConsultaService : IReportesService
             estudiantesPropuestos,
             CupoMaximo,
             estudiantesPropuestos < CupoMaximo,
-            estudiantes
+            estudiantes,
+            root.TryGetProperty("carrera", out var carr) ? carr.GetString() : null,
+            root.TryGetProperty("asignaturas", out var asig) ? asig.GetString() : null,
+            root.TryGetProperty("autorizadoPor", out var autp) ? autp.GetString() : null,
+            root.TryGetProperty("fechaAutorizacion", out var fau) ? fau.GetString() : null,
+            root.TryGetProperty("presentadoPor", out var pp) ? pp.GetString() : null,
+            root.TryGetProperty("estudiantesNombres", out var en) ? en.GetString() : null,
+            root.TryGetProperty("resolucionCpgic", out var rc) ? rc.GetString() : null,
+            root.TryGetProperty("presidenteCpgic", out var pc) ? pc.GetString() : null,
+            root.TryGetProperty("fechaAprobacion", out var fap) ? fap.GetString() : null
         );
     }
 
@@ -308,19 +317,13 @@ public class ReportesConsultaService : IReportesService
                         }
 
                         Fila("Unidad Académica:", "Facultad de Ingeniería de Sistemas");
-                        Fila("Carrera:", "Ingeniería de Software");
+                        Fila("Carrera:", string.IsNullOrWhiteSpace(p.Carrera) ? "(No especificada)" : p.Carrera);
                         Fila("Proyecto:", p.Titulo);
                         Fila("Número de participantes:", p.EstudiantesPropuestos.ToString());
                         Fila("Cupos / Disponible:", $"{p.EstudiantesPropuestos}/{p.CupoMaximo}   —   {(p.Disponible ? "Sí" : "No")}");
                         Fila("Departamento:", "Departamento de Informática y Ciencias de la Computación");
-                        Fila("Línea de investigación:", "Ingeniería de Software");
                         Fila("Asignaturas:",
-                            "Fundamentos de bases de datos (ISWD453)\n" +
-                            "Diseño de Software (ISWD523)\n" +
-                            "Metodologías ágiles (ISWD613)\n" +
-                            "Calidad de Software (ISWD652)\n" +
-                            "Aplicaciones Web Avanzadas (ISWD813)\n" +
-                            "Usabilidad y Accesibilidad (ISWD732)");
+                            string.IsNullOrWhiteSpace(p.Asignaturas) ? "(No especificadas)" : p.Asignaturas);
                         Fila("Profesor:", $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
                     });
 
@@ -464,9 +467,9 @@ public class ReportesConsultaService : IReportesService
                             .Text("SOLICITUD DE PARTICIPACIÓN DE MENOS DE 2 O MÁS DE 5 ESTUDIANTES (Opcional)")
                             .Bold().FontColor("#000000").FontSize(9);
                         table.Cell().Element(CeldaLabel).Text("Autorizado por:").Bold().FontSize(8.5f);
-                        table.Cell().Element(CeldaValor).MinHeight(22).Text("");
+                        table.Cell().Element(CeldaValor).MinHeight(22).Text(p.AutorizadoPor ?? "").FontSize(8.5f);
                         table.Cell().Element(CeldaLabel).Text("Fecha:").Bold().FontSize(8.5f);
-                        table.Cell().Element(CeldaValor).MinHeight(18).Text("");
+                        table.Cell().Element(CeldaValor).MinHeight(18).Text(p.FechaAutorizacion ?? "").FontSize(8.5f);
                     });
 
                     col.Item().PaddingTop(8);
@@ -492,17 +495,23 @@ public class ReportesConsultaService : IReportesService
                         }
 
                         AprobFila("Presentado por:",
-                            $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
+                            !string.IsNullOrWhiteSpace(p.PresentadoPor)
+                                ? p.PresentadoPor
+                                : $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
                         AprobFila("Estudiantes propuestos:",
-                            p.Estudiantes.Count > 0
-                                ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
-                                : "");
-                        AprobFila("Resolución de la CPGIC:", "", 40);
-                        AprobFila("Presidente de la CPGIC:", "", 30);
+                            !string.IsNullOrWhiteSpace(p.EstudiantesNombres)
+                                ? p.EstudiantesNombres
+                                : (p.Estudiantes.Count > 0
+                                    ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
+                                    : ""));
+                        AprobFila("Resolución de la CPGIC:", p.ResolucionCpgic ?? "", 40);
+                        AprobFila("Presidente de la CPGIC:", p.PresidenteCpgic ?? "", 30);
                         AprobFila("Fecha de aprobación:",
-                            p.FechaEnvio.HasValue
-                                ? p.FechaEnvio.Value.LocalDateTime.ToString("dd/MM/yyyy")
-                                : "");
+                            !string.IsNullOrWhiteSpace(p.FechaAprobacion)
+                                ? p.FechaAprobacion
+                                : (p.FechaEnvio.HasValue
+                                    ? p.FechaEnvio.Value.LocalDateTime.ToString("dd/MM/yyyy")
+                                    : ""));
                     });
                 });
 
@@ -635,13 +644,12 @@ public class ReportesConsultaService : IReportesService
                                 table.Cell().Element(CV).Text(val).FontSize(8.5f);
                             }
                             F("Unidad Académica:", "Facultad de Ingeniería en Sistemas (FIS)");
-                            F("Carrera:", "Ingeniería en Ciencias de la Computación");
+                            F("Carrera:", string.IsNullOrWhiteSpace(p.Carrera) ? "(No especificada)" : p.Carrera);
                             F("Proyecto:", p.Titulo);
                             F("Estudiantes propuestos:", $"{p.EstudiantesPropuestos} de {p.CupoMaximo}");
                             F("Cupos / Disponible:", $"{p.EstudiantesPropuestos}/{p.CupoMaximo}   —   {(p.Disponible ? "Sí" : "No")}");
                             F("Departamento:", "Departamento de Informática y Ciencias de la Computación");
-                            F("Línea de investigación:", "Ingeniería de Software y Sistemas de Información");
-                            F("Asignaturas:", "Trabajo de Integración Curricular");
+                            F("Asignaturas:", string.IsNullOrWhiteSpace(p.Asignaturas) ? "(No especificadas)" : p.Asignaturas);
                             F("Profesor:", $"Docente (ref. usuario #{p.DocenteUsuarioIdReferencia})");
 
                             // Estado resaltado
@@ -766,14 +774,19 @@ public class ReportesConsultaService : IReportesService
                                     table.Cell().Element(CV).Text(val).FontSize(8.5f)
                                         .FontColor(string.IsNullOrEmpty(val) ? "#BDBDBD" : "#424242");
                             }
-                            A("Presentado por:", $"Docente (ref. #{p.DocenteUsuarioIdReferencia})");
-                            A("Firma:", "", blank: true);
-                            A("Recomendaciones CPGIC:", "", blank: true);
-                            A("Aprobación CPGIC:", "");
-                            A("Fecha de aprobación:", p.FechaEnvio.HasValue ? p.FechaEnvio.Value.LocalDateTime.ToString("dd/MM/yyyy") : "");
-                            A("Estudiantes asignados:", p.Estudiantes.Count > 0
-                                ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
-                                : "Sin estudiantes asignados");
+                            A("Presentado por:", !string.IsNullOrWhiteSpace(p.PresentadoPor)
+                                ? p.PresentadoPor
+                                : $"Docente (ref. #{p.DocenteUsuarioIdReferencia})");
+                            A("Resolución CPGIC:", p.ResolucionCpgic ?? "");
+                            A("Presidente CPGIC:", p.PresidenteCpgic ?? "");
+                            A("Fecha de aprobación:", !string.IsNullOrWhiteSpace(p.FechaAprobacion)
+                                ? p.FechaAprobacion
+                                : (p.FechaEnvio.HasValue ? p.FechaEnvio.Value.LocalDateTime.ToString("dd/MM/yyyy") : ""));
+                            A("Estudiantes propuestos:", !string.IsNullOrWhiteSpace(p.EstudiantesNombres)
+                                ? p.EstudiantesNombres
+                                : (p.Estudiantes.Count > 0
+                                    ? string.Join(";  ", p.Estudiantes.Select(e => e.NombreCompleto))
+                                    : "Sin estudiantes asignados"));
                         });
                     });
 

@@ -26,7 +26,16 @@ public record PropuestaDetailDto(
     bool Activa,
     int EstudiantesPropuestos,
     IReadOnlyList<EstudianteAsignadoDto> Estudiantes,
-    IReadOnlyList<ObservacionDto> Observaciones);
+    IReadOnlyList<ObservacionDto> Observaciones,
+    string? Carrera = null,
+    string? Asignaturas = null,
+    string? AutorizadoPor = null,
+    string? FechaAutorizacion = null,
+    string? PresentadoPor = null,
+    string? EstudiantesNombres = null,
+    string? ResolucionCpgic = null,
+    string? PresidenteCpgic = null,
+    string? FechaAprobacion = null);
 
 public record EstudianteAsignadoDto(long EstudianteId, string NombreCompleto, string Email, DateTimeOffset FechaAsignacion);
 public record ObservacionDto(long Id, string Texto, long CreadoPorUsuarioId, DateTimeOffset CreadoEn);
@@ -38,7 +47,16 @@ public record CreatePropuestaRequest(
     string? Problema,
     string? ObjetivoGeneral,
     string? Alcance,
-    int EstudiantesPropuestos = 0);
+    int EstudiantesPropuestos = 0,
+    string? Carrera = null,
+    string? Asignaturas = null,
+    string? AutorizadoPor = null,
+    string? FechaAutorizacion = null,
+    string? PresentadoPor = null,
+    string? EstudiantesNombres = null,
+    string? ResolucionCpgic = null,
+    string? PresidenteCpgic = null,
+    string? FechaAprobacion = null);
 
 public record UpdatePropuestaRequest(
     string Titulo,
@@ -46,7 +64,16 @@ public record UpdatePropuestaRequest(
     string? Problema,
     string? ObjetivoGeneral,
     string? Alcance,
-    int EstudiantesPropuestos = 0);
+    int EstudiantesPropuestos = 0,
+    string? Carrera = null,
+    string? Asignaturas = null,
+    string? AutorizadoPor = null,
+    string? FechaAutorizacion = null,
+    string? PresentadoPor = null,
+    string? EstudiantesNombres = null,
+    string? ResolucionCpgic = null,
+    string? PresidenteCpgic = null,
+    string? FechaAprobacion = null);
 
 public record AsignarEstudiantesRequest(IReadOnlyList<long> EstudianteIds);
 

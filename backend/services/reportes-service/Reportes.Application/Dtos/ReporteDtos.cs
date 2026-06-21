@@ -34,4 +34,13 @@ public record PropuestaReporteDetalleDto(
     int EstudiantesPropuestos,
     int CupoMaximo,
     bool Disponible,
-    IReadOnlyList<EstudianteReporteDto> Estudiantes);
+    IReadOnlyList<EstudianteReporteDto> Estudiantes,
+    string? Carrera = null,
+    string? Asignaturas = null,
+    string? AutorizadoPor = null,
+    string? FechaAutorizacion = null,
+    string? PresentadoPor = null,
+    string? EstudiantesNombres = null,
+    string? ResolucionCpgic = null,
+    string? PresidenteCpgic = null,
+    string? FechaAprobacion = null);

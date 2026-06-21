@@ -181,7 +181,7 @@ import { PropuestaReporteDetalleDto } from '../../../core/models/reporte.models'
             </tr>
             <tr>
               <td class="lbl">Carrera:</td>
-              <td class="val">Ingeniería de Software</td>
+              <td class="val">{{ p.carrera || '(No especificada)' }}</td>
             </tr>
             <tr>
               <td class="lbl">Proyecto:</td>
@@ -205,12 +205,8 @@ import { PropuestaReporteDetalleDto } from '../../../core/models/reporte.models'
               <td class="val">Departamento de Informática y Ciencias de la Computación</td>
             </tr>
             <tr>
-              <td class="lbl">Línea de investigación:</td>
-              <td class="val">Ingeniería de Software</td>
-            </tr>
-            <tr>
               <td class="lbl">Asignaturas:</td>
-              <td class="val" style="white-space:pre-line">{{ asignaturas }}</td>
+              <td class="val" style="white-space:pre-line">{{ p.asignaturas || '(No especificadas)' }}</td>
             </tr>
             <tr>
               <td class="lbl">Profesor:</td>
@@ -356,23 +352,23 @@ import { PropuestaReporteDetalleDto } from '../../../core/models/reporte.models'
           <tbody>
             <tr>
               <td class="lbl" style="width:32%">Presentado por:</td>
-              <td class="val">Docente (ref. usuario #{{ p.docenteUsuarioIdReferencia }})</td>
+              <td class="val">{{ p.presentadoPor || ('Docente (ref. usuario #' + p.docenteUsuarioIdReferencia + ')') }}</td>
             </tr>
             <tr>
               <td class="lbl">Estudiantes propuestos:</td>
-              <td class="val">{{ nombresEstudiantes(p) }}</td>
+              <td class="val" style="white-space:pre-line">{{ p.estudiantesNombres || nombresEstudiantes(p) }}</td>
             </tr>
             <tr>
               <td class="lbl">Resolución de la CPGIC:</td>
-              <td class="val" style="height:45px"></td>
+              <td class="val" style="white-space:pre-line;min-height:45px">{{ p.resolucionCpgic || '—' }}</td>
             </tr>
             <tr>
               <td class="lbl">Presidente de la CPGIC:</td>
-              <td class="val" style="height:35px"></td>
+              <td class="val" style="min-height:35px">{{ p.presidenteCpgic || '—' }}</td>
             </tr>
             <tr>
               <td class="lbl">Fecha de aprobación:</td>
-              <td class="val">{{ p.fechaEnvio ? (p.fechaEnvio | date:'dd/MM/yyyy') : '—' }}</td>
+              <td class="val">{{ p.fechaAprobacion || (p.fechaEnvio ? (p.fechaEnvio | date:'dd/MM/yyyy') : '—') }}</td>
             </tr>
           </tbody>
         </table>
@@ -399,15 +395,6 @@ export class ReporteDetalleComponent implements OnInit {
   readonly letras = ['A', 'B', 'C', 'D', 'E'];
   readonly actividades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   readonly maxCupos = 5;
-
-  // Datos institucionales fijos, idénticos al formulario oficial F_AA_233A.
-  readonly asignaturas =
-    'Fundamentos de bases de datos (ISWD453)\n' +
-    'Diseño de Software (ISWD523)\n' +
-    'Metodologías ágiles (ISWD613)\n' +
-    'Calidad de Software (ISWD652)\n' +
-    'Aplicaciones Web Avanzadas (ISWD813)\n' +
-    'Usabilidad y Accesibilidad (ISWD732)';
 
   ngOnInit() {
     const raw = this.route.snapshot.paramMap.get('id');
