@@ -9,14 +9,30 @@
 Prototipos de alta fidelidad del Módulo de Consultas y Reportes diseñados en **Figma**,
 correspondientes a las pantallas principales del módulo.
 
-## Pantalla principal
+## Pantalla 1 — Inicio de sesión
 
-![Pantalla principal](img/Pantalla_principal.png)
+![Pantalla 1 - Inicio de sesión](img/Panrtallalogin1.png)
 
-## Imprimir listado
+## Pantalla 2 — Consultas y reportes
 
-![Imprimir listado](img/Imprimir_listado.png)
+![Pantalla 2 - Consultas y reportes](img/pantalla2consultasyreportes.png)
 
-## Imprimir formulario
+## Pantalla 3 — Propuestas disponibles
 
-![Imprimir formulario](img/Imprimir_formulario.png)
+![Pantalla 3 - Disponibles](img/Pantalla3%20disponibles.png)
+
+## Pantalla 4 — Propuestas no disponibles
+
+![Pantalla 4 - No disponibles](img/Panatalla4%20no%20disponibles.png)
+
+## Pantalla 5 — Propuestas no disponibles (detalle)
+
+![Pantalla 5 - Propuestas no disponibles](img/Pantalla5%20porpuestas%20no%20disponibles.png)
+
+## Pantalla 6 — Aviso de impresión PDF
+
+![Pantalla 6 - Aviso de impresión PDF](img/Pantalla%206%20aviso%20de%20impresion%20pdf.png)
+
+## Pantalla 7 — Impresión PDF realizada con éxito
+
+![Pantalla 7 - Impresión PDF con éxito](img/Pantalla%207%20infomorma%20que%20se%20haimporimidopdf%20con%20exito.png)
